@@ -1,4 +1,4 @@
-# Further options for specifiying the model
+# Further options when specifying the model
 
 You can pass the following optional keyword arguments in the *definition* of a newsvendor model `NVModel(cost, price, demand [; kwargs])`:
 
