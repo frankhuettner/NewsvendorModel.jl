@@ -9,7 +9,7 @@ NewsvendorModel.jl requires an installation of Julia (can be downloaded from the
 
 ```julia
 julia> import Pkg
-julia> Pkg.add(url="https://github.com/frankhuettner/NewsvendorModel.jl")
+julia> Pkg.add("NewsvendorModel")
 ```
 After installation, it can be loaded with the usual command.
 ```julia
