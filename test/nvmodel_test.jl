@@ -19,7 +19,7 @@ elvis = NVModel(DiscreteNonParametric(xs,ps), 6, 12, 2.5)
 ksweet = NVModel(Binomial(2000, 0.02), 28, 45, 27)
 @test_nowarn show(ksweet)
 
-beer = NVModel(Uniform(0, 300), 0, 0, -0.5, backlog = 1)
+beer = NVModel(Uniform(0, 300), cost = 0, price = 0, holding = 0.5, backlog = 1)
 @test_nowarn show(beer)
 
 maxtest = NVModel(Normal(90, 30), 0, 3, fixcost = 100, q_min=90, q_max = 120)
@@ -31,6 +31,10 @@ mintest = NVModel(Normal(90, 30), 1, 0, q_min=90, q_max = 120)
 unboundtest = NVModel(Normal(90, 30), 0, 3, q_min=90)
 @test_nowarn show(unboundtest) 
 
+thesaurus_nvm = NVModel(cost = 1.15, price = 2.75, demand = Normal(18, 6), 
+                        substitute = 2.75-1.15, backlog = 0.5, salvage = 1.15, 
+                        holding = 1.15 * 0.2 / 12)
+@test_nowarn show(thesaurus_nvm) 
 
 ## Testing solve and showing result
 res = solve(cheers_1) 

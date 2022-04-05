@@ -114,7 +114,7 @@ end
 
 
 # Characteristic functions
-underage_cost(nvm::NVModel) = nvm.price - nvm.cost + nvm.backlog
+underage_cost(nvm::NVModel) = nvm.price - nvm.cost + nvm.backlog - nvm.substitute
 overage_cost(nvm::NVModel) = nvm.cost - nvm.salvage + nvm.holding
 distr(nvm::NVModel) = nvm.demand
 "At q=0, expected profit = μ × (substitute - backlog) - fixed cost"
@@ -236,7 +236,7 @@ leftover(res::NVResult) = res.leftover
 	penalty(res::NVResult)
 Get expected backlog penalty from a stored result.
 """
-penalty(res::NVResult) = res.penalty
+# penalty(res::NVResult) = res.penalty
 
 
 function Base.show(io::IO, r::NVResult)
