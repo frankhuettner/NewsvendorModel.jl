@@ -37,7 +37,7 @@ julia> using Distributions
 
 Note that additional keyword arguments can be passed in *Step 1*: `salvage` value, `holding` cost of left-over inventory, `substitute` value obtained from serving a lost customer with an alternative, `backlog` penalty from an unserved customer, `fixcost` of the operations, a lower quantity bound `q_min`, and an upper quantity bound `q_max`. 
 
-Moreover, it is possible to obtain the unrounded optimal quantity by passing `rounded=false` in *Step 2*. For more details go to [the documentation](https://frankhuettner.github.io/NewsvendorModel.jl/dev/x2_options/).  
+Moreover, it is possible to obtain the unrounded optimal quantity by passing `rounded=false` in *Step 2*. For more details go to [the documentation](https://www.huettner.io/NewsvendorModel.jl/dev/x20_model_options/).  
 
 
 ## Example
@@ -58,9 +58,9 @@ julia> nvm = NVModel(demand = Normal(50, 20), cost = 5, price = 7)
 Julia shows the model data:
 ```julia
 Data of the Newsvendor Model
+ * Demand distribution: Normal{Float64}(μ=50.0, σ=20.0)
  * Unit cost: 5.00
  * Unit selling price: 7.00
- * Demand distribution: Normal{Float64}(μ=50.0, σ=20.0)
 ```
 
 Next, you can solve the model and store the result in the variable `res` like so:
@@ -84,7 +84,6 @@ Ordering the optimal quantity yields
  * Expected sales: 35.38 units
  * Expected lost sales: 14.62 units
  * Expected leftover: 3.62 units
- * Expected backlog penalty: 0.00
 -------------------------------------
 ```
 Moreover, you have stored the result in the varial `res`. Reading the data from the stored result is straight-forward:
@@ -99,5 +98,5 @@ julia> profit(res)
 ```
 
 Analogously, `underage_cost(res)`, `overage_cost(res)`, `critical_fractile(res)`, 
-`rounded(res)`, `sales(res)`, `lost_sales(res)`, `leftover(res)`, `penalty(res)`, 
+`rounded(res)`, `sales(res)`, `lost_sales(res)`, `leftover(res)`, 
 read the other information the stored in `res`. The model that was solved can be retrieved with `nvmodel(res)`.
