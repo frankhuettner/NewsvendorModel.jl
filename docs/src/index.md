@@ -23,7 +23,7 @@ julia> using Distributions
 
 ## Usage
 
-1. Define a model with the function `nvm = NVModel(cost, price, demand)` using the following required arguments:
+1. Define a model with the function `nvm = NVModel(demand, cost, price)` using the following required arguments:
     - unit production `cost`
     - unit selling `price`
     - `demand` distribution, which can be any choosen from the [Distributions.jl](https://juliastats.org/Distributions.jl/latest/univariate/) package
@@ -33,7 +33,7 @@ julia> using Distributions
     - `profit(nvm)` is short for the maximal expected profit `profit(nvm, q_opt(nvm))` 
     - `solve(nvm)` gives a list of further important metrics (critical fractile as well as expected sales, lost sales, and leftover).
 
-Additional keyword arguments specifying salvage value, backlog, fixcost, q_min, and q_max can be passed in *Step 1*. To obtain the unrounded optimal quantity, pass `rounded=false` in *Step 2*.
+Additional keyword arguments specifying salvage value, backlog penalty, holding cost, substitute value, fixcost, q_min, and q_max can be passed in *Step 1*. To obtain the unrounded optimal quantity, pass `rounded=false` in *Step 2*.
 
 
 
@@ -49,7 +49,7 @@ Consider an [example](https://en.wikipedia.org/wiki/Newsvendor_model#Numerical_e
 Define the model and store it in the variable `nvm` as follows:
 
 ```julia
-julia> nvm = NVModel(5, 7, Normal(50, 20))
+julia> nvm = NVModel(demand = Normal(50, 20), cost = 5, price = 7)
 ```
 
 Julia shows the model data:
