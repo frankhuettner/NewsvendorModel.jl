@@ -51,7 +51,7 @@ Consider an [example](https://en.wikipedia.org/wiki/Newsvendor_model#Numerical_e
 Define the model and store it in the variable `nvm` as follows:
 
 ```julia
-julia> nvm = NVModel(5, 7, Normal(50, 20))
+julia> nvm = NVModel(demand = Normal(50, 20), cost = 5, price = 7)
 ```
 
 Julia shows the model data:
