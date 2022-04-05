@@ -5,7 +5,8 @@ using Distributions
 makedocs(
     sitename = "NewsvendorModel.jl",
     format = Documenter.HTML(),
-    modules = [NewsvendorModel]
+    modules = [NewsvendorModel],
+    doctest = false
 )
 
 deploydocs(
