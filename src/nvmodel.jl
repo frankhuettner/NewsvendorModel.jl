@@ -117,8 +117,8 @@ end
 underage_cost(nvm::NVModel) = nvm.price - nvm.cost + nvm.backlog
 overage_cost(nvm::NVModel) = nvm.cost - nvm.salvage + nvm.holding
 distr(nvm::NVModel) = nvm.demand
-"At q=0, expected profit = - fixed cost - μ × backlog"
-profit_shift(nvm::NVModel) = -mean(nvm.demand) * nvm.backlog - nvm.fixcost
+"At q=0, expected profit = μ × (substitute - backlog) - fixed cost"
+profit_shift(nvm::NVModel) = mean(nvm.demand) * (nvm.substitute - nvm.backlog) - nvm.fixcost
 q_min(nvm::NVModel) = nvm.q_min
 q_max(nvm::NVModel) = nvm.q_max
 
@@ -138,6 +138,9 @@ function Base.show(io::IO, nvm::NVModel)
     end
     if nvm.backlog != zero(nvm.cost)
         @printf io "\n * Unit backlog penalty: %.2f" nvm.backlog
+    end
+    if nvm.substitute != zero(nvm.cost)
+        @printf io "\n * Unit substitute value: %.2f" nvm.substitute
     end
     if nvm.fixcost != zero(nvm.cost)
         @printf io "\n * Fixed cost: %.2f" nvm.fixcost
@@ -266,9 +269,9 @@ function Base.show(io::IO, r::NVResult)
     @printf io " * Expected sales: %.2f units\n" sales(r)
     @printf io " * Expected lost sales: %.2f units\n" lost_sales(r)
     @printf io " * Expected leftover: %.2f units\n" leftover(r)
-    if nvmodel(r).backlog != zero(nvmodel(r).cost)
-        @printf io " * Expected backlog penalty: %.2f\n" penalty(r)
-    end
+    # if nvmodel(r).backlog != zero(nvmodel(r).cost)
+    #     @printf io " * Expected backlog penalty: %.2f\n" penalty(r)
+    # end
     @printf io "-------------------------------------"
     return
 end
