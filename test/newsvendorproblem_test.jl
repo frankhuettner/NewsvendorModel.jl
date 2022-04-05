@@ -54,7 +54,7 @@
 
 
 # poisson distribution
-m = NVModel(0, 3, Poisson(90), q_min=90, q_max = 120)
+m = NVModel(Poisson(90), 0, 3, q_min=90, q_max = 120)
 @test q_opt(m) == 120.0
 @test leftover(m, 120.0) == 30.003682468511524
 @test profit(m, 120.0) == 269.98895259446545
@@ -75,8 +75,14 @@ flextrola = NVModel(cost = 72,
 solve(flextrola)
 
 ## Backlog penalty
-beer = NVModel(0, 0, Uniform(0, 300), backlog = 1, salvage = -0.5)
+beer = NVModel(Uniform(0, 300), cost = 0, price = 0, backlog = 1, salvage = -0.5)
 @test q_opt(beer) == 200
+
+# holding cost
+thesaurus_nvm = NVModel(cost = 1.15, price = 2.75, demand = Normal(18, 6), 
+                        substitute = 2.75-1.15, backlog = 0.5, salvage = 1.15, 
+                        holding = 1.15 * 0.2 / 12)
+solve(thesaurus_nvm)
 
 ## Incpomplete struct
                  
@@ -94,34 +100,34 @@ concreteIncompleteScenario = IncompleteScenario()
 ## Boundary cases 
 
 # If there is no penalty in ordering too much
-m = NVModel(0, 3, Normal(90, 30))
+m = NVModel(Normal(90, 30), 0, 3)
 @test q_opt(m) == Inf
 @test profit(m, q_opt(m)) == 270.00
 
 
 # If there is no penalty in ordering too much but a limit
-m = NVModel(0, 3, Normal(90, 30), q_min=90, q_max = 120)
+m = NVModel(Normal(90, 30), 0, 3, q_min=90, q_max = 120)
 @test q_opt(m) == 120.00
 
 
 # If there is no point in ordering
-m = NVModel(4, 3, Normal(90, 30), fixcost = 100)
+m = NVModel(Normal(90, 30), 4, 3, fixcost = 100)
 @test q_opt(m) == 0
 @test profit(m, q_opt(m)) == -100.0343938885343
 
 # If there is no point in ordering but we are forced to
-m = NVModel(4, 3, Normal(90, 30), q_min = 20, fixcost = 100)
+m = NVModel(Normal(90, 30), 4, 3, q_min = 20, fixcost = 100)
 @test q_opt(m) == 20
 @test profit(m, q_opt(m)) ≈ -120.29875100641834
 @test profit(m) ≈ -120.29875100641834
 
 
 # If rounding exceeds q_min
-m = NVModel(1, 5, Normal(90, 30), q_min = 115.1)
+m = NVModel(Normal(90, 30), 1, 5, q_min = 115.1)
 @test q_opt(m, rounded = false) == 115.24863700718743
 @test q_opt(m) == q_min(m)
 
 # If rounding exceeds q_max
-m = NVModel(1, 5, Normal(90, 28), q_min = 20, q_max = 113.9)
+m = NVModel(Normal(90, 28), 1, 5, q_min = 20, q_max = 113.9)
 @test q_opt(m, rounded = false) == 113.56539454004161
 @test q_opt(m) == q_max(m)
