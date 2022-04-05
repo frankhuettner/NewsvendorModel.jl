@@ -5,4 +5,4 @@ using Test, Documenter
 
 @testset "Testing metrics" begin include("newsvendorproblem_test.jl") end
 
-# doctest(NewsvendorModel)
+doctest(NewsvendorModel)
