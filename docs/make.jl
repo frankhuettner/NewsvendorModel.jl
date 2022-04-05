@@ -1,5 +1,6 @@
 using Documenter
 using NewsvendorModel
+using Distributions
 
 makedocs(
     sitename = "NewsvendorModel.jl",

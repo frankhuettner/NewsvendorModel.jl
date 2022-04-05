@@ -12,12 +12,12 @@ julia> import Pkg
 julia> Pkg.add("NewsvendorModel")
 ```
 After installation, it can be loaded with the usual command.
-```julia
+```jldoctest index
 julia> using NewsvendorModel
 ```
 
 Moreover, you need to load the Distributions.jl package.
-```julia
+```jldoctest index
 julia> using Distributions
 ```
 
@@ -48,12 +48,8 @@ Consider an [example](https://en.wikipedia.org/wiki/Newsvendor_model#Numerical_e
 
 Define the model and store it in the variable `nvm` as follows:
 
-```julia
+```jldoctest index
 julia> nvm = NVModel(demand = Normal(50, 20), cost = 5, price = 7)
-```
-
-Julia shows the model data:
-```julia
 Data of the Newsvendor Model
  * Unit cost: 5.00
  * Unit selling price: 7.00
@@ -61,11 +57,8 @@ Data of the Newsvendor Model
 ```
 
 Next, you can solve the model and store the result in the variable `res` like so:
-```julia
+```jldoctest index
 julia> res = solve(nvm)
-```
-This gives the following output:
-```julia
 =====================================
 Results of maximizing expected profit
  * Optimal quantity: 39 units
@@ -84,12 +77,12 @@ Ordering the optimal quantity yields
 -------------------------------------
 ```
 Moreover, you have stored the result in the variable `res`. Reading the data from the stored result is straight-forward:
-```julia
+```jldoctest index
 julia> q_opt(res)
 39
 ```
 
-```julia
+```jldoctest index
 julia> profit(res)
 52.40715617998893
 ```
@@ -98,7 +91,7 @@ Analogously, `underage_cost(res)`, `overage_cost(res)`, `critical_fractile(res)`
 
 Applying the above functions directly to the model (instead of to the result) is also possible, with the ability to pass a quantity. For instance,  
 
-```julia
+```jldoctest index
 julia> leftover(nvm, 39)
 3.656120545715868
 ```

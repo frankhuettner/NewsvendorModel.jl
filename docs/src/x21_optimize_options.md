@@ -4,8 +4,8 @@ Let us assume that we do not want the integer quantity but the exact real number
 
 ## Example
 
-```julia
-julia> nvm = NVModel(2, 7, Normal(50, 20))
+```jldoctest optoptions; setup = :(using Distributions, NewsvendorModel)
+julia> nvm = NVModel(demand = Normal(50, 20), cost = 2, price = 7)
 Data of the Newsvendor Model
  * Unit cost: 2.00
  * Unit selling price: 7.00
@@ -32,7 +32,7 @@ Ordering the optimal quantity yields
 
 This reveals a slighlty higher profit than with the standard (rounded up) integer result:
 
-```julia
+```jldoctest optoptions
 julia> q_opt(nvm)
 61
 
@@ -45,7 +45,7 @@ julia> profit(nvm)
 
 `rounded(res_real)` applied to a result tells whether the integer result was looked for is.
 
-```julia
+```jldoctest optoptions
 julia> rounded(res_real)
 false
 ```
