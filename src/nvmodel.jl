@@ -14,7 +14,9 @@ package [Distributions.jl](https://juliastats.org/Distributions.jl/latest/univar
 # Examples
 ```julia-repl
 julia> using Distributions
-julia> nvm = NVModel(Normal(50, 20), 5, 7)
+```
+```jldoctest nvm; setup = :(using Distributions, NewsvendorModel)
+julia> nvm = NVModel(demand = Normal(50, 20), cost = 5, price = 7)
 Data of the Newsvendor Model
  * Demand distribution: Normal{Float64}(μ=50.0, σ=20.0)
  * Unit cost: 5.00
@@ -42,10 +44,10 @@ Optional keyword arguments and their defaults:
 Define a newsvendor problem with unit cost 5, unit price 7, uniform demand
 between 50 and 80, where a unit salvages for 0.5, and backlog comes at a penalty 
 of 2 per unit, and the operations incur a fixed cost of 100, as follows:
-```julia-repl
+```jldoctest nvm
 julia> nvm2 = NVModel(demand = Uniform(50, 80), cost = 5, price = 7, salvage = 0.5, backlog = 2, fixcost = 100)
 Data of the Newsvendor Model
- * Demand distribution: Uniform{Float64}(a=30.0, b=100.0)
+ * Demand distribution: Uniform{Float64}(a=50.0, b=80.0)
  * Unit cost: 5.00
  * Unit selling price: 7.00
  * Unit salvage value: 0.50
@@ -57,14 +59,14 @@ Note that demand is a necessary argument that can be passed
 without keyword in first place. Moreover, only values that differ from the default will be shown.
 
 Define a newsvendor problem with unit cost 5, unit price 7, uniform demand
-between 30 and 100, where a unit salvages for 0.5, and backlog comes at a penalty 
+between 50 and 80, where a unit salvages for 0.5, and backlog comes at a penalty 
 of 2 per unit, and the operations incur a fixed cost of 100, as follows:
-```julia-repl
-julia> nvm3 = NVModel(Uniform(50, 80), 5, 7, 0.5, backlog = 2, fixcost = 100, q_min=0.0)
+```jldoctest nvm
+julia> nvm3 = NVModel(Uniform(50, 80), 5, 7, 0.5, backlog = 2, fixcost = 100, q_min=0)
 Data of the Newsvendor Model
+ * Demand distribution: Uniform{Float64}(a=50.0, b=80.0)
  * Unit cost: 5.00
  * Unit selling price: 7.00
- * Demand distribution: Uniform{Float64}(a=30.0, b=100.0)
  * Unit salvage value: 0.50
  * Unit backlog penalty: 2.00
  * Fixed cost: 100.00
@@ -126,10 +128,10 @@ q_max(nvm::NVModel) = nvm.q_max
 
 function Base.show(io::IO, nvm::NVModel)
     @printf io "Data of the Newsvendor Model\n"
+    @printf io " * Demand distribution: "
+    println(io, nvm.demand)
     @printf io " * Unit cost: %.2f\n" nvm.cost
-    @printf io " * Unit selling price: %.2f\n" nvm.price
-    @printf(io, " * Demand distribution: ")
-    print(io, nvm.demand)
+    @printf io " * Unit selling price: %.2f" nvm.price
     if nvm.salvage != zero(nvm.cost)
         @printf io "\n * Unit salvage value: %.2f" nvm.salvage
     end

@@ -51,9 +51,9 @@ Define the model and store it in the variable `nvm` as follows:
 ```jldoctest index
 julia> nvm = NVModel(demand = Normal(50, 20), cost = 5, price = 7)
 Data of the Newsvendor Model
+ * Demand distribution: Normal{Float64}(μ=50.0, σ=20.0)
  * Unit cost: 5.00
  * Unit selling price: 7.00
- * Demand distribution: Normal{Float64}(μ=50.0, σ=20.0)
 ```
 
 Next, you can solve the model and store the result in the variable `res` like so:

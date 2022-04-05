@@ -23,9 +23,9 @@ around 50 with standard deviation 20, where a unit salvages for 0.5, and back or
 ```jldoctest mdloptions; setup = :(using Distributions, NewsvendorModel)
 julia> nvm2 = NVModel(cost = 5, price = 7, demand = Normal(50, 20), salvage = 0.5, backlog = 2)
 Data of the Newsvendor Model
+ * Demand distribution: Normal{Float64}(μ=50.0, σ=20.0)
  * Unit cost: 5.00
  * Unit selling price: 7.00
- * Demand distribution: Normal{Float64}(μ=50.0, σ=20.0)
  * Unit salvage value: 0.50
  * Unit backlog penalty: 2.00
 ```
@@ -35,9 +35,9 @@ Note that cost, price, and demand are necessary arguments that can be passed wit
 ```jldoctest mdloptions
 julia> nvm3 = NVModel(demand = Normal(50, 20), cost = 5, price = 7, salvage = 0.5, backlog = 2, q_min=0)
 Data of the Newsvendor Model
+ * Demand distribution: Normal{Float64}(μ=50.0, σ=20.0)
  * Unit cost: 5.00
  * Unit selling price: 7.00
- * Demand distribution: Normal{Float64}(μ=50.0, σ=20.0)
  * Unit salvage value: 0.50
  * Unit backlog penalty: 2.00
 ```

@@ -14,9 +14,9 @@ The model is now defined and stored in the variable `nvm2` as follows:
 ```jldoctest distr
 julia> nvm2 = NVModel(demand = my_distr, cost = 5, price = 7)
 Data of the Newsvendor Model
+ * Demand distribution: Truncated(Normal{Float64}(μ=50.0, σ=20.0); lower=0.0)
  * Unit cost: 5.00
  * Unit selling price: 7.00
- * Demand distribution: Truncated(Normal{Float64}(μ=50.0, σ=20.0); lower=0.0)
 ```
 
 Optimization yields a slightly different result:

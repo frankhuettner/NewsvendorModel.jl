@@ -7,9 +7,9 @@ Let us assume that we do not want the integer quantity but the exact real number
 ```jldoctest optoptions; setup = :(using Distributions, NewsvendorModel)
 julia> nvm = NVModel(demand = Normal(50, 20), cost = 2, price = 7)
 Data of the Newsvendor Model
+ * Demand distribution: Normal{Float64}(μ=50.0, σ=20.0)
  * Unit cost: 2.00
  * Unit selling price: 7.00
- * Demand distribution: Normal{Float64}(μ=50.0, σ=20.0)
 
 julia> res_real = solve(nvm, rounded = false)
 =====================================
