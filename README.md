@@ -35,7 +35,7 @@ julia> using Distributions
     - `demand` distribution, which can be any choosen from the [Distributions.jl](https://juliastats.org/Distributions.jl/latest/univariate/) package
 2. Solve for optimal quanitity and obtain key metrics with the `solve(nvm)` function.
 
-Note that additional keyword arguments can be passed in *Step 1*: `salvage` value, `holding` cost of left-over inventory, `substitute` value obtained from serving a lost customer with an alternative, `backorder` penalty from an unserved customer, `fixcost` of the operations, a lower quantity bound `q_min`, and an upper quantity bound `q_max`. 
+Note that additional keyword arguments can be passed in *Step 1*: `salvage` value and `holding` cost of left-over inventory, `substitute` profit obtained from serving a lost customer with an alternative, `backorder` penalty from an unserved customer, `fixcost` of the operations, a lower quantity bound `q_min`, and an upper quantity bound `q_max`. 
 
 Moreover, it is possible to obtain the unrounded optimal quantity by passing `rounded=false` in *Step 2*. For more details go to [the documentation](https://www.huettner.io/NewsvendorModel.jl/dev/x20_model_options/).  
 
@@ -72,18 +72,21 @@ This gives the following output:
 =====================================
 Results of maximizing expected profit
  * Optimal quantity: 39 units
- * Expected profit: 52.69
+ * Expected profit: 52.41
 =====================================
 This is a consequence of
- * Cost of underage: 2.00
- * Cost of ovderage: 5.00
- * The critical fractile: 0.29
+ * Cost of underage:  2.00
+   ╚ + Price:               7.00
+   ╚ - Cost:                5.00
+ * Cost of overage:   5.00
+   ╚ + Cost:                5.00
+ * Critical fractile: 0.29
  * Rounded to closest integer: true
 -------------------------------------
 Ordering the optimal quantity yields
- * Expected sales: 35.38 units
- * Expected lost sales: 14.62 units
- * Expected leftover: 3.62 units
+ * Expected sales: 35.34 units
+ * Expected lost sales: 14.66 units
+ * Expected leftover: 3.66 units
 -------------------------------------
 ```
 Moreover, you have stored the result in the varial `res`. Reading the data from the stored result is straight-forward:
