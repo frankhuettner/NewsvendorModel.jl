@@ -34,24 +34,24 @@ Optional keyword arguments and their defaults:
 - `price` for selling a unit; defaults to `0`
 - `salvage` value obtained from scraping a leftover unit; defaults to `0`
 - `holding` cost obtained from a leftover unit, e.g., extra captial cost or warehousing cost; essentially a negative salvage value; defaults to `0`
-- `backlog` penalty for being short a unit, e.g., contractual penalty for missing delivery targets or missed future profit of an unserved customer; defaults to `0`
-- `substitute` benefit received from selling to an unserved customer, e.g., when selling another product or serving in the future; essentially a negative backlog penalty; defaults to `0`
+- `backorder` penalty for being short a unit, e.g., contractual penalty for missing delivery targets or missed future profit of an unserved customer; defaults to `0`
+- `substitute` benefit received from selling to an unserved customer, e.g., when selling another product or serving in the future; essentially a negative backorder penalty; defaults to `0`
 - `fixcost` fixed cost of operations; defaults to `0`
 - `q_min` minimal feasible quantity, e.g., due to production limits; must be nonnegative; defaults to `0`
 - `q_max` maximal feasible quantity, e.g., due to production limits; must be greater than or equal to `q_min`; defaults to `Inf`
 
 # Examples
 Define a newsvendor problem with unit cost 5, unit price 7, uniform demand
-between 50 and 80, where a unit salvages for 0.5, and backlog comes at a penalty 
+between 50 and 80, where a unit salvages for 0.5, and backorder comes at a penalty 
 of 2 per unit, and the operations incur a fixed cost of 100, as follows:
 ```jldoctest nvm
-julia> nvm2 = NVModel(demand = Uniform(50, 80), cost = 5, price = 7, salvage = 0.5, backlog = 2, fixcost = 100)
+julia> nvm2 = NVModel(demand = Uniform(50, 80), cost = 5, price = 7, salvage = 0.5, backorder = 2, fixcost = 100)
 Data of the Newsvendor Model
  * Demand distribution: Uniform{Float64}(a=50.0, b=80.0)
  * Unit cost: 5.00
  * Unit selling price: 7.00
  * Unit salvage value: 0.50
- * Unit backlog penalty: 2.00
+ * Unit backorder penalty: 2.00
  * Fixed cost: 100.00
 ```
 
@@ -59,16 +59,16 @@ Note that demand is a necessary argument that can be passed
 without keyword in first place. Moreover, only values that differ from the default will be shown.
 
 Define a newsvendor problem with unit cost 5, unit price 7, uniform demand
-between 50 and 80, where a unit salvages for 0.5, and backlog comes at a penalty 
+between 50 and 80, where a unit salvages for 0.5, and backorder comes at a penalty 
 of 2 per unit, and the operations incur a fixed cost of 100, as follows:
 ```jldoctest nvm
-julia> nvm3 = NVModel(Uniform(50, 80), 5, 7, 0.5, backlog = 2, fixcost = 100, q_min=0)
+julia> nvm3 = NVModel(Uniform(50, 80), 5, 7, 0.5, backorder = 2, fixcost = 100, q_min=0)
 Data of the Newsvendor Model
  * Demand distribution: Uniform{Float64}(a=50.0, b=80.0)
  * Unit cost: 5.00
  * Unit selling price: 7.00
  * Unit salvage value: 0.50
- * Unit backlog penalty: 2.00
+ * Unit backorder penalty: 2.00
  * Fixed cost: 100.00
 julia> nvm3 == nvm2
 true
@@ -81,7 +81,7 @@ struct NVModel <: AbstractNewsvendorProblem
     price::Real
     salvage::Real
     holding::Real
-    backlog::Real
+    backorder::Real
     substitute::Real
     fixcost::Real
     q_min::Real
@@ -95,32 +95,32 @@ end
 
 # Outer constructor
 function NVModel(d; cost = 0.0, price = zero(cost), salvage = zero(cost), 
-    holding = zero(cost), backlog = zero(cost), substitute = zero(cost), 
+    holding = zero(cost), backorder = zero(cost), substitute = zero(cost), 
     fixcost = zero(cost), q_min = 0, q_max = Inf)
-    c, p, s, h, b, r, f = promote(cost, price, salvage, holding, backlog, substitute, fixcost)
+    c, p, s, h, b, r, f = promote(cost, price, salvage, holding, backorder, substitute, fixcost)
     NVModel(d, c, p, s, h, b, r, f, q_min, q_max)
 end
 function NVModel(d, cost, price, salvage = zero(cost); 
-    holding = zero(cost), backlog = zero(cost), substitute = zero(cost), 
+    holding = zero(cost), backorder = zero(cost), substitute = zero(cost), 
     fixcost = zero(cost), q_min = 0, q_max = Inf)
-    c, p, s, h, b, r, f = promote(cost, price, salvage, holding, backlog, substitute, fixcost)
+    c, p, s, h, b, r, f = promote(cost, price, salvage, holding, backorder, substitute, fixcost)
     NVModel(d, c, p, s, h, b, r, f, q_min, q_max)
 end
 function NVModel(;demand, cost = 0.0, price = zero(cost), salvage = zero(cost), 
-    holding = zero(cost), backlog = zero(cost), substitute = zero(cost), 
+    holding = zero(cost), backorder = zero(cost), substitute = zero(cost), 
     fixcost = zero(cost), q_min = 0, q_max = Inf)
-    c, p, s, h, b, r, f = promote(cost, price, salvage, holding, backlog, substitute, fixcost)
+    c, p, s, h, b, r, f = promote(cost, price, salvage, holding, backorder, substitute, fixcost)
     NVModel(demand, c, p, s, h, b, r, f, q_min, q_max)
 end
 
 
 
 # Characteristic functions
-underage_cost(nvm::NVModel) = nvm.price - nvm.cost + nvm.backlog - nvm.substitute
+underage_cost(nvm::NVModel) = nvm.price - nvm.cost + nvm.backorder - nvm.substitute
 overage_cost(nvm::NVModel) = nvm.cost - nvm.salvage + nvm.holding
 distr(nvm::NVModel) = nvm.demand
-"At q=0, expected profit = μ × (substitute - backlog) - fixed cost"
-profit_shift(nvm::NVModel) = mean(nvm.demand) * (nvm.substitute - nvm.backlog) - nvm.fixcost
+"At q=0, expected profit = μ × (substitute - backorder) - fixed cost"
+profit_shift(nvm::NVModel) = mean(nvm.demand) * (nvm.substitute - nvm.backorder) - nvm.fixcost
 q_min(nvm::NVModel) = nvm.q_min
 q_max(nvm::NVModel) = nvm.q_max
 
@@ -138,8 +138,8 @@ function Base.show(io::IO, nvm::NVModel)
     if nvm.holding != zero(nvm.cost)
         @printf io "\n * Unit holding value: %.2f" nvm.holding
     end
-    if nvm.backlog != zero(nvm.cost)
-        @printf io "\n * Unit backlog penalty: %.2f" nvm.backlog
+    if nvm.backorder != zero(nvm.cost)
+        @printf io "\n * Unit backorder penalty: %.2f" nvm.backorder
     end
     if nvm.substitute != zero(nvm.cost)
         @printf io "\n * Unit substitute value: %.2f" nvm.substitute
@@ -236,7 +236,7 @@ leftover(res::NVResult) = res.leftover
 
 """
 	penalty(res::NVResult)
-Get expected backlog penalty from a stored result.
+Get expected backorder penalty from a stored result.
 """
 # penalty(res::NVResult) = res.penalty
 
@@ -271,8 +271,8 @@ function Base.show(io::IO, r::NVResult)
     @printf io " * Expected sales: %.2f units\n" sales(r)
     @printf io " * Expected lost sales: %.2f units\n" lost_sales(r)
     @printf io " * Expected leftover: %.2f units\n" leftover(r)
-    # if nvmodel(r).backlog != zero(nvmodel(r).cost)
-    #     @printf io " * Expected backlog penalty: %.2f\n" penalty(r)
+    # if nvmodel(r).backorder != zero(nvmodel(r).cost)
+    #     @printf io " * Expected backorder penalty: %.2f\n" penalty(r)
     # end
     @printf io "-------------------------------------"
     return
@@ -301,6 +301,6 @@ function solve(nvm::NVModel; rounded = true)
         sales(nvm, q),
         leftover(nvm, q),
         lost_sales(nvm, q),
-        nvm.backlog * lost_sales(nvm, q),
+        nvm.backorder * lost_sales(nvm, q),
     )
 end

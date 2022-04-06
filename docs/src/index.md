@@ -33,7 +33,7 @@ julia> using Distributions
     - `profit(nvm)` is short for the maximal expected profit `profit(nvm, q_opt(nvm))` 
     - `solve(nvm)` gives a list of further important metrics (critical fractile as well as expected sales, lost sales, and leftover).
 
-Additional keyword arguments specifying salvage value, backlog penalty, holding cost, substitute value, fixcost, q_min, and q_max can be passed in *Step 1*. To obtain the unrounded optimal quantity, pass `rounded=false` in *Step 2*.
+Additional keyword arguments specifying salvage value, backorder penalty, holding cost, substitute value, fixcost, q_min, and q_max can be passed in *Step 1*. To obtain the unrounded optimal quantity, pass `rounded=false` in *Step 2*.
 
 
 

@@ -35,7 +35,7 @@ julia> using Distributions
     - `demand` distribution, which can be any choosen from the [Distributions.jl](https://juliastats.org/Distributions.jl/latest/univariate/) package
 2. Solve for optimal quanitity and obtain key metrics with the `solve(nvm)` function.
 
-Note that additional keyword arguments can be passed in *Step 1*: `salvage` value, `holding` cost of left-over inventory, `substitute` value obtained from serving a lost customer with an alternative, `backlog` penalty from an unserved customer, `fixcost` of the operations, a lower quantity bound `q_min`, and an upper quantity bound `q_max`. 
+Note that additional keyword arguments can be passed in *Step 1*: `salvage` value, `holding` cost of left-over inventory, `substitute` value obtained from serving a lost customer with an alternative, `backorder` penalty from an unserved customer, `fixcost` of the operations, a lower quantity bound `q_min`, and an upper quantity bound `q_max`. 
 
 Moreover, it is possible to obtain the unrounded optimal quantity by passing `rounded=false` in *Step 2*. For more details go to [the documentation](https://www.huettner.io/NewsvendorModel.jl/dev/x20_model_options/).  
 
