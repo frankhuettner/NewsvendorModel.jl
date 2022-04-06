@@ -30,13 +30,13 @@ Optional keyword arguments and their defaults:
 
 	NVModel(demand [; kwargs])
 
-- `cost` for a unit; defaults to `0`
-- `price` for selling a unit; defaults to `0`
-- `salvage` value obtained from scraping a leftover unit; defaults to `0`
-- `holding` cost obtained from a leftover unit, e.g., extra captial cost or warehousing cost; essentially a negative salvage value; defaults to `0`
-- `backorder` penalty for being short a unit, e.g., contractual penalty for missing delivery targets or missed future profit of an unserved customer; defaults to `0`
-- `substitute` benefit received from selling to an unserved customer, e.g., when selling another product or serving in the future; essentially a negative backorder penalty; defaults to `0`
-- `fixcost` fixed cost of operations; defaults to `0`
+- `cost` for a unit; defaults to `0.0`
+- `price` for selling a unit; defaults to `0.0`
+- `salvage` value obtained from scraping a leftover unit; defaults to `0.0`
+- `holding` cost induced by a leftover unit, e.g., extra captial cost or warehousing cost; essentially a negative salvage value; defaults to `0.0`
+- `backorder` penalty for being short a unit, e.g., contractual penalty for missing delivery targets or missed future profit of an unserved customer; defaults to `0.0`
+- `substitute` benefit received from selling an alternative to an unserved customer, e.g., when selling another product or serving in the future; essentially a negative backorder penalty; defaults to `0.0`
+- `fixcost` fixed cost of operations; defaults to `0.0`
 - `q_min` minimal feasible quantity, e.g., due to production limits; must be nonnegative; defaults to `0`
 - `q_max` maximal feasible quantity, e.g., due to production limits; must be greater than or equal to `q_min`; defaults to `Inf`
 
@@ -72,6 +72,20 @@ Data of the Newsvendor Model
  * Fixed cost: 100.00
 julia> nvm3 == nvm2
 true
+```
+
+Holding cost is essentially overage cost.
+Backorder penalty is essentially underage cost.
+The beer game has holding cost of 0.5 USD and backlog costs 1 USD per unit. 
+Demand is assumed to be uniform betwen 0 and 300. 
+```jldoctest nvm
+julia> beer = NVModel(Uniform(0, 300), backorder = 1, holding = 0.5)
+Data of the Newsvendor Model
+ * Demand distribution: Uniform{Float64}(a=0.0, b=300.0)
+ * Unit cost: 0.00
+ * Unit selling price: 0.00
+ * Unit holding cost: 0.50
+ * Unit backorder penalty: 1.00
 ```
 
 """
@@ -120,7 +134,8 @@ underage_cost(nvm::NVModel) = nvm.price - nvm.cost + nvm.backorder - nvm.substit
 overage_cost(nvm::NVModel) = nvm.cost - nvm.salvage + nvm.holding
 distr(nvm::NVModel) = nvm.demand
 "At q=0, expected profit = μ × (substitute - backorder) - fixed cost"
-profit_shift(nvm::NVModel) = mean(nvm.demand) * (nvm.substitute - nvm.backorder) - nvm.fixcost
+profit_shift(nvm::NVModel) = ( mean(nvm.demand) * (nvm.substitute - nvm.backorder) 
+                              - nvm.fixcost )
 q_min(nvm::NVModel) = nvm.q_min
 q_max(nvm::NVModel) = nvm.q_max
 
@@ -136,13 +151,13 @@ function Base.show(io::IO, nvm::NVModel)
         @printf io "\n * Unit salvage value: %.2f" nvm.salvage
     end
     if nvm.holding != zero(nvm.cost)
-        @printf io "\n * Unit holding value: %.2f" nvm.holding
+        @printf io "\n * Unit holding cost: %.2f" nvm.holding
     end
     if nvm.backorder != zero(nvm.cost)
         @printf io "\n * Unit backorder penalty: %.2f" nvm.backorder
     end
     if nvm.substitute != zero(nvm.cost)
-        @printf io "\n * Unit substitute value: %.2f" nvm.substitute
+        @printf io "\n * Unit substitute profit: %.2f" nvm.substitute
     end
     if nvm.fixcost != zero(nvm.cost)
         @printf io "\n * Fixed cost: %.2f" nvm.fixcost
@@ -153,6 +168,7 @@ function Base.show(io::IO, nvm::NVModel)
     if nvm.q_max != Inf
         print(io, "\n * Maximal feasible quanitity: $(nvm.q_max) units")
     end
+    @printf io "\n"
     return
 end
 
@@ -172,7 +188,10 @@ mutable struct NVResult
     sales::Real
     leftover::Real
     lost_sales::Real
-    penalty::Real
+    salvage_revenue::Real
+    holding_cost::Real
+    backorder_penalty::Real
+    substitute_profit::Real
 end
 """
 	nvm(res::NVResult)
@@ -235,10 +254,28 @@ Get expected leftover from a stored result.
 leftover(res::NVResult) = res.leftover
 
 """
-	penalty(res::NVResult)
+    salvage_revenue(res::NVResult)
+Get expected salvage revenue from a stored result.
+"""
+salvage_revenue(res::NVResult) = res.salvage_revenue
+
+"""
+    holding_cost(res::NVResult)
+Get expected holding cost from a stored result.
+"""
+holding_cost(res::NVResult) = res.holding_cost
+
+"""
+	backorder_penalty(res::NVResult)
 Get expected backorder penalty from a stored result.
 """
-# penalty(res::NVResult) = res.penalty
+backorder_penalty(res::NVResult) = res.backorder_penalty
+
+"""
+    substitute_profit(res::NVResult)
+Get expected substitute profit from a stored result.
+"""
+substitute_profit(res::NVResult) = res.substitute_profit
 
 
 function Base.show(io::IO, r::NVResult)
@@ -252,9 +289,30 @@ function Base.show(io::IO, r::NVResult)
     @printf io " * Expected profit: %.2f\n" profit(r)
     @printf io "=====================================\n"
     @printf io "This is a consequence of\n"
-    @printf io " * Cost of underage: %.2f\n" underage_cost(r)
-    @printf io " * Cost of overage: %.2f\n" overage_cost(r)
-    @printf io " * The critical fractile: %.2f\n" critical_fractile(r)
+    @printf io " * Cost of underage:  %.2f\n" underage_cost(r)
+    if nvmodel(r).price != zero(nvmodel(r).cost)
+        @printf io "   ╚ + Price:               %.2f\n" nvmodel(r).price
+    end
+    if nvmodel(r).cost != zero(nvmodel(r).cost)
+        @printf io "   ╚ - Cost:                %.2f\n" nvmodel(r).cost
+    end
+    if nvmodel(r).backorder != zero(nvmodel(r).cost)
+        @printf io "   ╚ + Backorder penalty:   %.2f\n" nvmodel(r).backorder
+    end
+    if nvmodel(r).substitute != zero(nvmodel(r).cost)
+        @printf io "   ╚ - Substitute profit:   %.2f\n" nvmodel(r).substitute
+    end
+    @printf io " * Cost of overage:   %.2f\n" overage_cost(r)
+    if nvmodel(r).cost != zero(nvmodel(r).cost)
+        @printf io "   ╚ + Cost:                %.2f\n" nvmodel(r).cost
+    end
+    if nvmodel(r).salvage != zero(nvmodel(r).cost)
+        @printf io "   ╚ - Salvage value:       %.2f\n" nvmodel(r).salvage
+    end
+    if nvmodel(r).holding != zero(nvmodel(r).cost)
+        @printf io "   ╚ + Holding cost:        %.2f\n" nvmodel(r).holding
+    end
+    @printf io " * Critical fractile: %.2f\n" critical_fractile(r)
     if 0 >= critical_fractile(r)
         @printf io " ! No benefit from trade !\n"
     end
@@ -271,10 +329,19 @@ function Base.show(io::IO, r::NVResult)
     @printf io " * Expected sales: %.2f units\n" sales(r)
     @printf io " * Expected lost sales: %.2f units\n" lost_sales(r)
     @printf io " * Expected leftover: %.2f units\n" leftover(r)
-    # if nvmodel(r).backorder != zero(nvmodel(r).cost)
-    #     @printf io " * Expected backorder penalty: %.2f\n" penalty(r)
-    # end
-    @printf io "-------------------------------------"
+    if nvmodel(r).salvage != zero(nvmodel(r).cost)
+        @printf io " * Expected salvage revenue: %.2f\n" salvage_revenue(r)
+    end
+    if nvmodel(r).backorder != zero(nvmodel(r).cost)
+        @printf io " * Expected backorder penalty: %.2f\n" backorder_penalty(r)
+    end
+    if nvmodel(r).holding != zero(nvmodel(r).cost)
+        @printf io " * Expected holding cost: %.2f\n" holding_cost(r)
+    end
+    if nvmodel(r).substitute != zero(nvmodel(r).cost)
+        @printf io " * Expected substitute profit: %.2f\n" substitute_profit(r)
+    end
+    @printf io "-------------------------------------\n"
     return
 end
 
@@ -291,6 +358,11 @@ exact real number, set the keyword arguement `rounded = false`.
 """
 function solve(nvm::NVModel; rounded = true)
     q = q_opt(nvm, rounded = rounded)
+    salvage_revenue = nvm.salvage * leftover(nvm, q)
+    holding_cost = nvm.holding * leftover(nvm, q)
+    backorder_penalty = nvm.backorder * lost_sales(nvm, q)
+    substitute_profit = nvm.substitute * lost_sales(nvm, q)
+
     NVResult(nvm,
         rounded,
         q,
@@ -301,6 +373,9 @@ function solve(nvm::NVModel; rounded = true)
         sales(nvm, q),
         leftover(nvm, q),
         lost_sales(nvm, q),
-        nvm.backorder * lost_sales(nvm, q),
+        salvage_revenue,
+        holding_cost,
+        backorder_penalty,
+        substitute_profit,
     )
 end

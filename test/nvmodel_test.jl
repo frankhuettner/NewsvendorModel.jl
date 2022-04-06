@@ -19,7 +19,7 @@ elvis = NVModel(DiscreteNonParametric(xs,ps), 6, 12, 2.5)
 ksweet = NVModel(Binomial(2000, 0.02), 28, 45, 27)
 @test_nowarn show(ksweet)
 
-beer = NVModel(Uniform(0, 300), cost = 0, price = 0, holding = 0.5, backorder = 1)
+beer = NVModel(Uniform(0, 300), holding = 0.5, backorder = 1)
 @test_nowarn show(beer)
 
 maxtest = NVModel(Normal(90, 30), 0, 3, fixcost = 100, q_min=90, q_max = 120)

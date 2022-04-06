@@ -18,9 +18,12 @@ Results of maximizing expected profit
  * Expected profit: 202.41
 =====================================
 This is a consequence of
- * Cost of underage: 5.00
- * Cost of overage: 2.00
- * The critical fractile: 0.71
+ * Cost of underage:  5.00
+   ╚ + Price:               7.00
+   ╚ - Cost:                2.00
+ * Cost of overage:   2.00
+   ╚ + Cost:                2.00
+ * Critical fractile: 0.71
  * Rounded to closest integer: false
 -------------------------------------
 Ordering the optimal quantity yields
