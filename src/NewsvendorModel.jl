@@ -29,5 +29,6 @@ include("./newsvendorproblem.jl")
 include("./leftover.jl")
 include("./nvmodel.jl")
 
+include("simutils/NewsvendorSimulationUtils.jl")
 
 end # module
