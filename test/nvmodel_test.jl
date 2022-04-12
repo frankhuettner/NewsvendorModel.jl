@@ -57,6 +57,7 @@ res = solve(cheers_1, rounded=false)
 @test_nowarn show(solve(maxtest) )
 @test_nowarn show(solve(mintest) )
 @test_nowarn show(solve(unboundtest) )
+@test_nowarn show(solve(thesaurus_nvm) )
 
 
 
