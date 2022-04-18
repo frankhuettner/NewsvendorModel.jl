@@ -143,7 +143,7 @@ end
 Compute expected leftover inventory when stocking quantity q.
 
 ```math
-E[\textrm{leftover}] = \int_{-\infty}0^q(q - x)f(x)dx 
+E[\textrm{leftover}] = \int_{-\infty}^q (q - x)f(x)dx 
 ```
 """
 function leftover(anp::AbstractNewsvendorProblem, q)

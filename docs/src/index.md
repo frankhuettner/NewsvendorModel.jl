@@ -24,9 +24,9 @@ julia> using Distributions
 ## Usage
 
 1. Define a model with the function `nvm = NVModel(demand, cost, price)` using the following required arguments:
+    - `demand` distribution, which can be any choosen from the [univariate distributions of the Distributions.jl package](https://juliastats.org/Distributions.jl/latest/univariate/)
     - unit production `cost`
     - unit selling `price`
-    - `demand` distribution, which can be any choosen from the [Distributions.jl](https://juliastats.org/Distributions.jl/latest/univariate/) package
 2. Find the optimal quanitity and obtain key metrics: 
     - `q_opt(nvm)` returns the quantity that maximizes the expected profit
     - `profit(nvm, q)` to get the expected profit if `q` is stocked
