@@ -78,7 +78,7 @@ solve(flextrola)
 beer = NVModel(Uniform(0, 300), cost = 0, price = 0, backorder = 1, salvage = -0.5)
 @test q_opt(beer) == 200
 
-# holding cost and substitute profit
+# holding cost and substitute margin
 thesaurus_nvm = NVModel(cost = 1.15, price = 2.75, demand = Normal(18, 6), 
                         substitute = 2.75-1.15, backorder = 0.5, salvage = 1.15, 
                         holding = 1.15 * 0.2 / 12)

@@ -157,7 +157,7 @@ function Base.show(io::IO, nvm::NVModel)
         @printf io "\n * Unit backorder penalty: %.2f" nvm.backorder
     end
     if nvm.substitute != zero(nvm.cost)
-        @printf io "\n * Unit substitute profit: %.2f" nvm.substitute
+        @printf io "\n * Unit substitute margin: %.2f" nvm.substitute
     end
     if nvm.fixcost != zero(nvm.cost)
         @printf io "\n * Fixed cost: %.2f" nvm.fixcost
@@ -322,7 +322,7 @@ function Base.show(io::IO, r::NVResult)
             @printf io " ! No upper bound on quanitity !\n"
         end
     else
-        @printf io " * Rounded to closest integer: %s\n" rounded(r)
+        @printf io " * Rounded to nearest integer: %s\n" rounded(r)
     end
     @printf io "-------------------------------------\n"
     @printf io "Ordering the optimal quantity yields\n"

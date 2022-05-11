@@ -24,7 +24,7 @@ This is a consequence of
  * Cost of overage:   2.00
    ╚ + Cost:                2.00
  * Critical fractile: 0.71
- * Rounded to closest integer: false
+ * Rounded to nearest integer: false
 -------------------------------------
 Ordering the optimal quantity yields
  * Expected sales: 46.44 units
