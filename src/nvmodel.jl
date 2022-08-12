@@ -157,7 +157,7 @@ function Base.show(io::IO, nvm::NVModel)
         @printf io "\n * Unit backorder penalty: %.2f" nvm.backorder
     end
     if nvm.substitute != zero(nvm.cost)
-        @printf io "\n * Unit substitute margin: %.2f" nvm.substitute
+        @printf io "\n * Unit substitute profit: %.2f" nvm.substitute
     end
     if nvm.fixcost != zero(nvm.cost)
         @printf io "\n * Fixed cost: %.2f" nvm.fixcost
