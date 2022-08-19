@@ -88,16 +88,16 @@ Returns closest next integer unless `rounded=false`; then, it returns exact real
 Clamps at q_min and q_max.
 """
 function q_opt(anp::AbstractNewsvendorProblem; rounded = true)
-
-    if critical_fractile(anp) <= 0
+    CF = critical_fractile(anp)
+    if CF <= zero(CF)
         return q_min(anp)
     end
 
-    if critical_fractile(anp) >= 1
+    if CF >= one(CF)
         return min(maximum(distr(anp)), q_max(anp))
     end
 
-    q = clamp(quantile(distr(anp), critical_fractile(anp)), q_min(anp), q_max(anp))
+    q = clamp(quantile(distr(anp), CF), q_min(anp), q_max(anp))
     
     if rounded == false  return q end
 
