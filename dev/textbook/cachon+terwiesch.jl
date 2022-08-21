@@ -8,18 +8,18 @@ using InteractiveUtils
 # Load the packages needed
 using NewsvendorModel, Distributions
 
-# ╔═╡ a12a8adb-f80c-4adb-8078-256da423e0eb
-# using PlutoUI; TableOfContents(aside=false)
-
 # ╔═╡ 1e8dae5b-fa24-46d0-b591-4c6a719e0a6c
 md"""
-# Cachon & Terwiesch: Matching Supply with Demand 
 
-This notebook illustrates the usage of [NewsvendorModel.jl](https://github.com/frankhuettner/NewsvendorModel.jl) with examples from the excellent textbook by [Cachon & Terwiesch (3rd](http://cachon-terwiesch.net/3e/index.php) or [4th](https://www.mheducation.com/highered/product/matching-supply-demand-introduction-operations-management-cachon-terwiesch/M9780078096655.html) edition).
+This notebook illustrates the usage of [NewsvendorModel.jl](https://github.com/frankhuettner/NewsvendorModel.jl) with examples from the **excellent textbook by [Cachon & Terwiesch (3rd](http://cachon-terwiesch.net/3e/index.php)** or [4th](https://www.mheducation.com/highered/product/matching-supply-demand-introduction-operations-management-cachon-terwiesch/M9780078096655.html) edition).
 
 These notes are not self-contained but should be considered as a companion to the above text book.
 
 """
+
+# ╔═╡ e48eb4c3-a372-4335-8d04-05f76ccc06a7
+md"You can load this notebook in [Pluto](https://github.com/fonsp/Pluto.jl) from here: [https://github.com/frankhuettner/NewsvendorModel.jl/blob/main/docs/src/textbook/cachon%2Bterwiesch.jl](https://github.com/frankhuettner/NewsvendorModel.jl/blob/main/docs/src/textbook/cachon%2Bterwiesch.jl)
+"
 
 # ╔═╡ 65eb4c20-8998-11ec-3abf-bb0dda80c6a9
 md"""
@@ -1570,8 +1570,8 @@ version = "1.4.1+0"
 """
 
 # ╔═╡ Cell order:
-# ╟─a12a8adb-f80c-4adb-8078-256da423e0eb
 # ╟─1e8dae5b-fa24-46d0-b591-4c6a719e0a6c
+# ╟─e48eb4c3-a372-4335-8d04-05f76ccc06a7
 # ╟─65eb4c20-8998-11ec-3abf-bb0dda80c6a9
 # ╠═29d61cca-ad0f-4753-8789-f9da6e557b87
 # ╠═11be7ca9-d279-4ff5-8b4d-4d1a5e144e43
