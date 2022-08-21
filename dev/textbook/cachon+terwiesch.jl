@@ -11,13 +11,19 @@ using PlutoUI; TableOfContents()
 # Load the packages needed
 using NewsvendorModel, Distributions
 
-# ╔═╡ 65eb4c20-8998-11ec-3abf-bb0dda80c6a9
+# ╔═╡ 1e8dae5b-fa24-46d0-b591-4c6a719e0a6c
 md"""
 # Cachon & Terwiesch: Matching Supply with Demand 
 
 This notebook illustrates the usage of [NewsvendorModel.jl](https://github.com/frankhuettner/NewsvendorModel.jl) with examples from the excellent textbook by [Cachon & Terwiesch (3rd](http://cachon-terwiesch.net/3e/index.php) or [4th](https://www.mheducation.com/highered/product/matching-supply-demand-introduction-operations-management-cachon-terwiesch/M9780078096655.html) edition).
 
 These notes are not self-contained but should be considered as a companion to the above text book.
+
+"""
+
+# ╔═╡ 65eb4c20-8998-11ec-3abf-bb0dda80c6a9
+md"""
+
 
 ## O'Neill Hammer 3/2
 
@@ -114,7 +120,7 @@ profit(oneill, 3263) + lost_sales(oneill, 3263) * (190 - 132)
 
 # ╔═╡ 74e1fa73-67f4-473b-84a9-facd895aa666
 md"""
-## Some exercises 
+## Selected Exercises 
 
 The book offers exercises with solutions. Here is a small selection that illustrates the convinience of Distributions.jl and NewsvendorModel.jl (everything is very brief and a detailed explanation can be found in the book).
 
@@ -129,32 +135,51 @@ mcclure_demand = Normal(200, 80)
 # Define model
 mcclure_nvm = NVModel(cost = 12, price = 20, salvage = 12 - 4,demand = mcclure_demand)
 
+# ╔═╡ 98557010-627f-4de7-be6a-be583b48a121
+md"##### a) Pr[demand > 400]"
+
 # ╔═╡ db9a34bb-f82c-4360-8931-350b62de9816
-# a) Pr[demand > 400]
 1 - cdf(mcclure_demand, 400)
 
+# ╔═╡ cffc5227-1acd-4f58-9c9d-5527c2755632
+md"##### b) Pr[demand < 100]"
+
 # ╔═╡ b59d4b3d-b8f8-440c-9640-9f0a78e8a6a9
-# b) Pr[demand < 100]
 cdf(mcclure_demand, 100)
 
+# ╔═╡ 9a4131d2-0fb7-49b1-9fd6-f5b5f1cff5c5
+md"##### c) Pr[160 < demand < 240]
+"
+
 # ╔═╡ a0ba77aa-d973-4f29-80da-c94f8cb177fb
-# c) Pr[160 < demand < 240]
 cdf(mcclure_demand, 240) - cdf(mcclure_demand, 160)
 
+# ╔═╡ 47ff9c6d-d508-457c-af75-2b9914d5ed53
+md"##### d) Pr[160 < demand < 240]
+"
+
 # ╔═╡ ca0d15f8-0c0f-446e-9ebc-0d8b04a2e37e
-# d) Pr[160 < demand < 240]
 q_opt(mcclure_nvm)
 
+# ╔═╡ 8701aae7-c40b-4ef6-b347-2938d11c6ec8
+md"##### e) Quantity such that Pr[demand ≤ q] = 95% 
+"
+
 # ╔═╡ 33a8fdc2-3221-4540-b49c-d51c4fbd7ba0
-# e) Quantity such that Pr[demand ≤ q] = 95%
 quantile(mcclure_demand, 0.95)
 
+# ╔═╡ ed7e61da-5905-40f0-8d57-0721093eef77
+md"##### f) 
+"
+
 # ╔═╡ 672bcd43-e09b-4215-bf40-101a7e1ae0ce
-# f) 
 1 - 0.95
 
+# ╔═╡ d792260e-41bc-4b77-8444-5ddb4f536376
+md"##### g) Profit if q = 300
+"
+
 # ╔═╡ 36b39a81-a876-4a0e-9dd9-5224436e2ef1
-# g) Profit if q = 300
 profit(mcclure_nvm, 300)
 
 # ╔═╡ 3daa3e0e-4aae-4b07-8ee8-e0fbef9abde2
@@ -168,32 +193,59 @@ ecotable_demand = Poisson(4.5)
 # Define model
 ecotable_nvm = NVModel(cost = 32, price = 55, salvage = 20, demand = ecotable_demand)
 
+# ╔═╡ 8f7e2e1a-ac27-4a6f-9dda-e4364d1a69db
+md"##### a) Pr[demand > 3]
+"
+
 # ╔═╡ 330bfc55-5197-4adb-a898-5adab6af407d
-# a) Pr[demand > 3]
 1 - cdf(ecotable_demand, 3)
 
+# ╔═╡ 242c68ee-7147-4912-9652-960a459aca7e
+md"##### b) Pr[demand < 7]
+
+"
+
 # ╔═╡ 5c05eb75-3e1f-4ef2-93d5-9d1a91286fea
-# b) Pr[demand < 7]
 cdf(ecotable_demand, 7)
 
+# ╔═╡ 820727f5-21b3-4c4b-a632-822f4c41f69c
+md"##### c) Optimal order quantity
+
+"
+
 # ╔═╡ cc2cfbf4-5e75-4de8-85dc-7cf24353164b
-# c) Optimal order quantity
 q_opt(ecotable_nvm)
 
+# ╔═╡ 2914e282-8b19-4274-ba28-ae79ac03edb2
+md"##### d) Expected sales at q = 4
+
+"
+
 # ╔═╡ b9873a29-a100-43d5-b40e-783b33f69613
-# d) Expected sales at q = 4
 sales(ecotable_nvm, 4)
 
+# ╔═╡ f07108dd-7555-409a-85ca-5f7742a4a8dc
+md"##### d) Expected leftover at q = 6
+
+"
+
 # ╔═╡ d89982d5-64de-46e7-8847-79b78ad71d56
-# d) Expected leftover at q = 6
 leftover(ecotable_nvm, 6)
 
+# ╔═╡ 82d30f07-364d-4d6f-a7ff-81f3ef3e4790
+md"##### f) Smallest quantity q such that Pr[demand ≤ q] ≥ 90%
+
+"
+
 # ╔═╡ d76f07dc-1cb9-4d04-8fdf-e8be630de3e4
-# f) Smallest quantity q such that Pr[demand ≤ q] ≥ 90%
 quantile(ecotable_demand, 0.90)
 
+# ╔═╡ b1c38013-98b3-4edd-a87c-855ed4da4808
+md"##### d) Expected profit at q = 8
+
+"
+
 # ╔═╡ a6b96124-c8e1-40f3-8f23-add5b6187704
-# d) Expected profit at q = 8
 profit(ecotable_nvm, 8)
 
 # ╔═╡ ecff0cfe-8ea2-4eb3-a064-106ae6f2bfa8
@@ -216,24 +268,47 @@ elvis_demand = DiscreteNonParametric(xs,ps)
 # Define model
 elvis_nvm  = NVModel(cost = 6, price = 12, demand = elvis_demand, salvage = 2.5)
 
+# ╔═╡ 814cbf4c-5b21-4374-b484-1380a03e449c
+md"##### a) 
+
+
+"
+
 # ╔═╡ f1e2056f-f376-4bf3-9f54-19a10491200c
-# a) 
 cdf(elvis_demand, 30_000)
 
+# ╔═╡ 3de90f41-a309-4e70-b48f-7f9bee92fb51
+md"##### b) 
+
+
+"
+
 # ╔═╡ 70463c90-3e9c-4b27-842f-a1f4e42f3b28
-# b) 
 q_opt(elvis_nvm)
 
+# ╔═╡ 5d4e2337-309e-49ba-a970-19b512ae58e1
+md"##### c) 
+
+
+"
+
 # ╔═╡ 9f81c748-52ce-43c5-8b60-d4ed62e3b7c9
-# c) 
 quantile(elvis_demand, 0.9)
 
+# ╔═╡ 85621539-1a57-4626-adde-251074f16803
+md"##### d) 
+
+"
+
 # ╔═╡ 69a85cc2-db01-4574-af5d-62bc9f9fd6ae
-# d) 
 leftover(elvis_nvm, 50_000)
 
+# ╔═╡ 56d4dcc9-562f-4915-9a78-ea9a49ee8d09
+md"##### e) 
+
+"
+
 # ╔═╡ f1b912de-b66f-4684-a29d-5b3279fb4b50
-# e) 
 quantile(elvis_demand, 1.0) 
 
 # ╔═╡ 0a704099-7515-44fd-b329-34880166c4c3
@@ -1532,7 +1607,8 @@ version = "1.4.1+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═d0b8dc56-6fd2-4ebd-9371-418b4086247f
+# ╟─d0b8dc56-6fd2-4ebd-9371-418b4086247f
+# ╟─1e8dae5b-fa24-46d0-b591-4c6a719e0a6c
 # ╟─65eb4c20-8998-11ec-3abf-bb0dda80c6a9
 # ╠═29d61cca-ad0f-4753-8789-f9da6e557b87
 # ╠═11be7ca9-d279-4ff5-8b4d-4d1a5e144e43
@@ -1552,22 +1628,36 @@ version = "1.4.1+0"
 # ╟─74e1fa73-67f4-473b-84a9-facd895aa666
 # ╠═390a2fdd-0910-4941-ac1f-11bb3174c564
 # ╠═1cc679f3-f753-487a-8cda-3e8369c5ffe1
+# ╟─98557010-627f-4de7-be6a-be583b48a121
 # ╠═db9a34bb-f82c-4360-8931-350b62de9816
+# ╟─cffc5227-1acd-4f58-9c9d-5527c2755632
 # ╠═b59d4b3d-b8f8-440c-9640-9f0a78e8a6a9
+# ╟─9a4131d2-0fb7-49b1-9fd6-f5b5f1cff5c5
 # ╠═a0ba77aa-d973-4f29-80da-c94f8cb177fb
+# ╟─47ff9c6d-d508-457c-af75-2b9914d5ed53
 # ╠═ca0d15f8-0c0f-446e-9ebc-0d8b04a2e37e
+# ╟─8701aae7-c40b-4ef6-b347-2938d11c6ec8
 # ╠═33a8fdc2-3221-4540-b49c-d51c4fbd7ba0
+# ╟─ed7e61da-5905-40f0-8d57-0721093eef77
 # ╠═672bcd43-e09b-4215-bf40-101a7e1ae0ce
+# ╟─d792260e-41bc-4b77-8444-5ddb4f536376
 # ╠═36b39a81-a876-4a0e-9dd9-5224436e2ef1
 # ╟─3daa3e0e-4aae-4b07-8ee8-e0fbef9abde2
 # ╠═d64bf64a-92a7-4747-8099-d525308cb99d
 # ╠═7127b4d0-87f5-42d7-a08c-0623bda740ae
+# ╟─8f7e2e1a-ac27-4a6f-9dda-e4364d1a69db
 # ╠═330bfc55-5197-4adb-a898-5adab6af407d
+# ╟─242c68ee-7147-4912-9652-960a459aca7e
 # ╠═5c05eb75-3e1f-4ef2-93d5-9d1a91286fea
+# ╟─820727f5-21b3-4c4b-a632-822f4c41f69c
 # ╠═cc2cfbf4-5e75-4de8-85dc-7cf24353164b
+# ╟─2914e282-8b19-4274-ba28-ae79ac03edb2
 # ╠═b9873a29-a100-43d5-b40e-783b33f69613
+# ╟─f07108dd-7555-409a-85ca-5f7742a4a8dc
 # ╠═d89982d5-64de-46e7-8847-79b78ad71d56
+# ╟─82d30f07-364d-4d6f-a7ff-81f3ef3e4790
 # ╠═d76f07dc-1cb9-4d04-8fdf-e8be630de3e4
+# ╟─b1c38013-98b3-4edd-a87c-855ed4da4808
 # ╠═a6b96124-c8e1-40f3-8f23-add5b6187704
 # ╟─ecff0cfe-8ea2-4eb3-a064-106ae6f2bfa8
 # ╟─fea33a55-38b8-44d7-b549-3174099c7b58
@@ -1575,10 +1665,15 @@ version = "1.4.1+0"
 # ╠═574c2a61-46fa-4f5c-8eac-7f08a507dc2a
 # ╠═a2daca19-41eb-4349-aa10-1a7518b0a0f9
 # ╠═47237478-72ba-4650-bd96-f8de2b5baf3d
+# ╟─814cbf4c-5b21-4374-b484-1380a03e449c
 # ╠═f1e2056f-f376-4bf3-9f54-19a10491200c
+# ╟─3de90f41-a309-4e70-b48f-7f9bee92fb51
 # ╠═70463c90-3e9c-4b27-842f-a1f4e42f3b28
+# ╟─5d4e2337-309e-49ba-a970-19b512ae58e1
 # ╠═9f81c748-52ce-43c5-8b60-d4ed62e3b7c9
+# ╟─85621539-1a57-4626-adde-251074f16803
 # ╠═69a85cc2-db01-4574-af5d-62bc9f9fd6ae
+# ╟─56d4dcc9-562f-4915-9a78-ea9a49ee8d09
 # ╠═f1b912de-b66f-4684-a29d-5b3279fb4b50
 # ╠═0a704099-7515-44fd-b329-34880166c4c3
 # ╟─0a2b7ffa-54ab-4aec-bd00-c8c6068f294f
