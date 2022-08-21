@@ -4,12 +4,15 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ d0b8dc56-6fd2-4ebd-9371-418b4086247f
-using PlutoUI; TableOfContents()
+# ╔═╡ a12a8adb-f80c-4adb-8078-256da423e0eb
+using PlutoUI
 
 # ╔═╡ 29d61cca-ad0f-4753-8789-f9da6e557b87
 # Load the packages needed
 using NewsvendorModel, Distributions
+
+# ╔═╡ 11b91069-9b05-4eb3-ad4c-5fc64a95eced
+TableOfContents(aside=false)
 
 # ╔═╡ 1e8dae5b-fa24-46d0-b591-4c6a719e0a6c
 md"""
@@ -25,7 +28,7 @@ These notes are not self-contained but should be considered as a companion to th
 md"""
 
 
-## O'Neill Hammer 3/2
+## ONeill Hammer 3/2
 
 The leading case of the book is about the **O'Neill Hammer 3/2**, with the following information (for a detailed treatment, it is referred to the sources below).
 
@@ -1607,7 +1610,8 @@ version = "1.4.1+0"
 """
 
 # ╔═╡ Cell order:
-# ╟─d0b8dc56-6fd2-4ebd-9371-418b4086247f
+# ╟─a12a8adb-f80c-4adb-8078-256da423e0eb
+# ╟─11b91069-9b05-4eb3-ad4c-5fc64a95eced
 # ╟─1e8dae5b-fa24-46d0-b591-4c6a719e0a6c
 # ╟─65eb4c20-8998-11ec-3abf-bb0dda80c6a9
 # ╠═29d61cca-ad0f-4753-8789-f9da6e557b87
