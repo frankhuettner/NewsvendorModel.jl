@@ -10,13 +10,20 @@ using NewsvendorModel, Distributions,  StatsBase, Plots
 
 # ╔═╡ 65eb4c20-8998-11ec-3abf-bb0dda80c6a9
 md"""
-# Nahmias & Olson: Production and Operations Analysis 
-
-This notebook illustrates the usage of [NewsvendorModel.jl](https://github.com/frankhuettner/NewsvendorModel.jl) with examples from the excellent textbook by **Nahmias & Olson 7th** or [8th](https://www.waveland.com/browse.php?t=662) edition.
+This notebook illustrates the usage of [NewsvendorModel.jl](https://github.com/frankhuettner/NewsvendorModel.jl) with examples from the **excellent textbook by Nahmias & Olson 7th** or [8th](https://www.waveland.com/browse.php?t=662) edition.
 
 These notes are not self-contained but should be considered as a companion to the above text book.
 
-## Example Mac
+You can load this notebook in [Pluto](https://github.com/fonsp/Pluto.jl) from here: [https://github.com/frankhuettner/NewsvendorModel.jl/blob/main/docs/src/textbook/nahmias%2Bolson.jl](https://github.com/frankhuettner/NewsvendorModel.jl/blob/main/docs/src/textbook/nahmias%2Bolson.jl)
+
+
+
+"""
+
+# ╔═╡ e2cae904-9ac7-4ec7-8ec0-2eda4c286e6f
+md"""
+
+## Mac Magazine Store
 
 Unit values:
 - cost per unit ordered = 75
@@ -187,7 +194,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0"
 manifest_format = "2.0"
-project_hash = "1d3ef0f0e1414c755aff8f9c2295439845c71906"
+project_hash = "671292edcaa2229ed90becbae94728a0644cd09f"
 
 [[deps.Adapt]]
 deps = ["LinearAlgebra"]
@@ -1223,8 +1230,9 @@ version = "1.4.1+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═29d61cca-ad0f-4753-8789-f9da6e557b87
 # ╟─65eb4c20-8998-11ec-3abf-bb0dda80c6a9
+# ╠═29d61cca-ad0f-4753-8789-f9da6e557b87
+# ╟─e2cae904-9ac7-4ec7-8ec0-2eda4c286e6f
 # ╟─d1735113-39fa-45f7-b5a4-1925d9985e3d
 # ╠═d8d53f72-c901-45ff-99d8-9c0190460442
 # ╠═b8f5f21e-edfa-46b4-b574-4723c03db163
