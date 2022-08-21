@@ -5,365 +5,165 @@ using Markdown
 using InteractiveUtils
 
 # ╔═╡ 29d61cca-ad0f-4753-8789-f9da6e557b87
-# Load the packages needed
-using NewsvendorModel, Distributions
-
-# ╔═╡ 1e8dae5b-fa24-46d0-b591-4c6a719e0a6c
-md"""
-
-This notebook illustrates the usage of [NewsvendorModel.jl](https://github.com/frankhuettner/NewsvendorModel.jl) with examples from the **excellent textbook by [Cachon & Terwiesch (3rd](http://cachon-terwiesch.net/3e/index.php)** or [4th](https://www.mheducation.com/highered/product/matching-supply-demand-introduction-operations-management-cachon-terwiesch/M9780078096655.html) edition).
-
-These notes are not self-contained but should be considered as a companion to the above text book.
-
-"""
-
-# ╔═╡ e48eb4c3-a372-4335-8d04-05f76ccc06a7
-md"You can load this notebook in [Pluto](https://github.com/fonsp/Pluto.jl) from here: [https://github.com/frankhuettner/NewsvendorModel.jl/blob/main/docs/src/textbook/cachon%2Bterwiesch.jl](https://github.com/frankhuettner/NewsvendorModel.jl/blob/main/docs/src/textbook/cachon%2Bterwiesch.jl)
-"
+# Load the needed packages
+using NewsvendorModel, Distributions,  StatsBase, Plots
 
 # ╔═╡ 65eb4c20-8998-11ec-3abf-bb0dda80c6a9
 md"""
+# Nahmias & Olson: Production and Operations Analysis 
 
+This notebook illustrates the usage of [NewsvendorModel.jl](https://github.com/frankhuettner/NewsvendorModel.jl) with examples from the excellent textbook by **Nahmias & Olson 7th** or [8th](https://www.waveland.com/browse.php?t=662) edition.
 
-## ONeill Hammer 3/2
+These notes are not self-contained but should be considered as a companion to the above text book.
 
-The leading case of the book is about the **O'Neill Hammer 3/2**, with the following information (for a detailed treatment, it is referred to the sources below).
+## Example Mac
 
 Unit values:
-- cost per unit ordered = 110
-- selling price per unit = 190
-- salvage value = 190
+- cost per unit ordered = 75
+- selling price per unit = 25
+- salvage value = 10
 
-Demand distribution:
-- expected demand = 3192
-- standard deviation of demand = 1181
+The following is known about the demand distribution (empirical from previous data)
+
+
 """
+
+# ╔═╡ d1735113-39fa-45f7-b5a4-1925d9985e3d
+md" ### Demand and distribution fitting"
+
+# ╔═╡ d8d53f72-c901-45ff-99d8-9c0190460442
+# store the given data in the variable `observed_demand`
+observed_demand = vec([15 19 9 12 9 22 4 7 8 11 14 11 6 11 9 18 10 0 14 12 8 9 5 4 4 17 18 14 15 8 6 7 12 15 15 19 9 10 9 16 8 11 11 18 15 17 19 14 14 17 13 12])
+
+# ╔═╡ b8f5f21e-edfa-46b4-b574-4723c03db163
+D̄ = mean(observed_demand)
+
+# ╔═╡ 6fda8ecb-2b3a-4b89-9bc1-b6aad4efcb1f
+s = std(observed_demand)
+
+# ╔═╡ bfbbc931-b36c-4e46-8375-03de53d51cfd
+begin
+	h1 = fit(Histogram,observed_demand, nbins=10)
+
+	plot(h1, ylabel="Observed frequency", xlabel = "Number of sales", legend=nothing)
+	
+	d = Normal(D̄, s)
+	lo, hi = quantile.(d, [0.01, 0.99])
+	x = range(lo, hi; length = 100)
+	plot(twinx(), x, pdf.(d, x), legend=nothing, color = :red, yticks = false)
+end
+
+# ╔═╡ 994805b2-c68b-4800-b3ea-def39ec6cd87
+md"An alternative is to use MLE:"
+
+# ╔═╡ 1b7eb3b0-0ac9-4bef-9cf9-fc1da1072150
+fit(Normal, observed_demand)
+
+# ╔═╡ 44352ed2-e3c2-4ab1-a39e-c695242b5a12
+md" ### Newsvendor Model"
 
 # ╔═╡ 11be7ca9-d279-4ff5-8b4d-4d1a5e144e43
 # Define the model
-oneill = NVModel(cost = 110, 
-                 price = 190, 
-                 salvage = 90, 
-                 demand = Normal(3192, 1181)
-         )
+mac = NVModel(cost = 25, price = 75, salvage = 10, demand = Normal(D̄, s)  )
 
 # ╔═╡ fa3ce275-8a61-4204-af49-01ea8592b288
 # Solve the model
-solve(oneill)
+solve(mac)
 
 # ╔═╡ e20d3e01-39c4-46f2-8d8a-414bfd3048eb
 md"""
-Note that the result is slightly different from the textbook, which suggests the order quantity 4,184 (instead of 4,186). This is due to rounding errors in the textbook.
-
-### 2-stage calculation
-
-The authors also consider the scenario in which it is possible to make a second order later during the selling period (what follows is very brief and I recommend looking up the book). It is assumed that 
-
-
-* the unit cost for the second order are 20% higher ⇒ 20% * 110 = 22. Yet, 
-* demand for the rest of the season is assumed to be certain at that stage;
-* the reorder stage is early enough to ensure that we have enough units until we receive our second delivery
-
-Now there are two decision points: 
-
-1. How many units to order prior to the season starts.
-2. How many units to order at the second stage.
-
-To find the optimal order quantity for (1), we think of the product as follows:
-- Having a unit leftover is effectively loosing Cₒ = 20
-- Having a unit too little is creating not such a heavy damage anymore; instead, we can save the day be ordering remaining demand at the second stage, albeit at a worse price ⇒ we miss out Cᵤ = 22
-
-This is as if we had a product traded for zero cost and zero price, but having a unit left over costs 20 ⇒ salvage = -20 ⇒ Cₒ = 20. Being short a unit costs a backorder penalty of 22 ⇒ Cᵤ = 22.
+### Discrete Demand
 """
 
+# ╔═╡ cce4b651-c1ae-470a-a5b2-3c9e62d0bb4d
+h = fit(Histogram, observed_demand, nbins =22)
+
+# ╔═╡ 8a2b3ea9-b376-4d47-9d74-802106db2b98
+epd = h.weights / 52
+
+# ╔═╡ 72406e40-a328-4936-91e9-b9ae4c354165
+mac_discrete_demand = DiscreteNonParametric(0:22, epd)
+
 # ╔═╡ af1c94ce-4900-4e4d-93b0-096917fd288d
-oneill_1st_order_calculation = NVModel( demand = Normal(3192, 1181),
-										cost = 0, 
-                                        price = 0, 
-                                        salvage = -20, 
-                                        backorder = 22,
-                                        )
+mac_discrete = NVModel(cost = 25, price = 75, salvage = 10, 
+						demand = mac_discrete_demand  )
 
 # ╔═╡ 198bb582-9f88-48a7-85ea-d71559f0a34b
 md"This yields the following critical fractile for the 1st stage:"
 
 # ╔═╡ 60509577-f814-4770-ab01-41083bac00a5
-critical_fractile(oneill_1st_order_calculation)
-
-# ╔═╡ 84376bac-546a-4e44-bb97-7ecde967994b
-md"This yields the following optimal order quantity for the 1st stage:"
-
-# ╔═╡ ddb6f2c1-ca7a-4eb7-9f91-10323f21de44
-q_opt(oneill_1st_order_calculation)
-
-# ╔═╡ a372b600-4940-47da-861d-a903cdb77f8a
-md"""
-Ordering 3263 units results in the following expected lost sales, which is the expected order quantity for the second order:
-"""
-
-# ╔═╡ 44114735-088e-4223-b92a-b60da42f3fdc
-lost_sales(oneill, 3263)
-
-# ╔═╡ e1cd3166-7163-454a-8a6d-9fb8f6eabcb3
-md"""
-Ordering 3263 further yields the following expected profit (based on original unit values):
-"""
-
-# ╔═╡ 251daa01-9129-485c-8fd4-d660c5ebff6d
-profit(oneill, 3263)
-
-# ╔═╡ 981e3a79-a219-4870-9eae-2a01acd3e459
-md"In total, this promises the following expected profit:"
-
-# ╔═╡ 958d0d9a-81d9-40a7-a009-0ffbaeb26a0d
-profit(oneill, 3263) + lost_sales(oneill, 3263) * (190 - 132)
+solve(mac_discrete)
 
 # ╔═╡ 74e1fa73-67f4-473b-84a9-facd895aa666
 md"""
-## Selected Exercises 
+## Some exercises 
 
 The book offers exercises with solutions. Here is a small selection that illustrates the convinience of Distributions.jl and NewsvendorModel.jl (everything is very brief and a detailed explanation can be found in the book).
 
-### McClure Books
+### Mac's thesaurus
 """
 
-# ╔═╡ 390a2fdd-0910-4941-ac1f-11bb3174c564
-# Define demand 
-mcclure_demand = Normal(200, 80)
-
-# ╔═╡ 1cc679f3-f753-487a-8cda-3e8369c5ffe1
-# Define model
-mcclure_nvm = NVModel(cost = 12, price = 20, salvage = 12 - 4,demand = mcclure_demand)
-
-# ╔═╡ 98557010-627f-4de7-be6a-be583b48a121
-md"##### a) Pr[demand > 400]"
-
-# ╔═╡ db9a34bb-f82c-4360-8931-350b62de9816
-1 - cdf(mcclure_demand, 400)
-
-# ╔═╡ cffc5227-1acd-4f58-9c9d-5527c2755632
-md"##### b) Pr[demand < 100]"
-
-# ╔═╡ b59d4b3d-b8f8-440c-9640-9f0a78e8a6a9
-cdf(mcclure_demand, 100)
-
-# ╔═╡ 9a4131d2-0fb7-49b1-9fd6-f5b5f1cff5c5
-md"##### c) Pr[160 < demand < 240]
-"
-
-# ╔═╡ a0ba77aa-d973-4f29-80da-c94f8cb177fb
-cdf(mcclure_demand, 240) - cdf(mcclure_demand, 160)
-
-# ╔═╡ 47ff9c6d-d508-457c-af75-2b9914d5ed53
-md"##### d) Pr[160 < demand < 240]
-"
-
-# ╔═╡ ca0d15f8-0c0f-446e-9ebc-0d8b04a2e37e
-q_opt(mcclure_nvm)
-
-# ╔═╡ 8701aae7-c40b-4ef6-b347-2938d11c6ec8
-md"##### e) Quantity such that Pr[demand ≤ q] = 95% 
-"
-
-# ╔═╡ 33a8fdc2-3221-4540-b49c-d51c4fbd7ba0
-quantile(mcclure_demand, 0.95)
-
-# ╔═╡ ed7e61da-5905-40f0-8d57-0721093eef77
-md"##### f) 
-"
-
-# ╔═╡ 672bcd43-e09b-4215-bf40-101a7e1ae0ce
-1 - 0.95
-
-# ╔═╡ d792260e-41bc-4b77-8444-5ddb4f536376
-md"##### g) Profit if q = 300
-"
-
-# ╔═╡ 36b39a81-a876-4a0e-9dd9-5224436e2ef1
-profit(mcclure_nvm, 300)
-
-# ╔═╡ 3daa3e0e-4aae-4b07-8ee8-e0fbef9abde2
-md" ### EcoTable Tea "
-
-# ╔═╡ d64bf64a-92a7-4747-8099-d525308cb99d
-# Define demand 
-ecotable_demand = Poisson(4.5)
-
-# ╔═╡ 7127b4d0-87f5-42d7-a08c-0623bda740ae
-# Define model
-ecotable_nvm = NVModel(cost = 32, price = 55, salvage = 20, demand = ecotable_demand)
-
-# ╔═╡ 8f7e2e1a-ac27-4a6f-9dda-e4364d1a69db
-md"##### a) Pr[demand > 3]
-"
-
-# ╔═╡ 330bfc55-5197-4adb-a898-5adab6af407d
-1 - cdf(ecotable_demand, 3)
-
-# ╔═╡ 242c68ee-7147-4912-9652-960a459aca7e
-md"##### b) Pr[demand < 7]
-
-"
-
-# ╔═╡ 5c05eb75-3e1f-4ef2-93d5-9d1a91286fea
-cdf(ecotable_demand, 7)
-
-# ╔═╡ 820727f5-21b3-4c4b-a632-822f4c41f69c
-md"##### c) Optimal order quantity
-
-"
-
-# ╔═╡ cc2cfbf4-5e75-4de8-85dc-7cf24353164b
-q_opt(ecotable_nvm)
-
-# ╔═╡ 2914e282-8b19-4274-ba28-ae79ac03edb2
-md"##### d) Expected sales at q = 4
-
-"
-
-# ╔═╡ b9873a29-a100-43d5-b40e-783b33f69613
-sales(ecotable_nvm, 4)
-
-# ╔═╡ f07108dd-7555-409a-85ca-5f7742a4a8dc
-md"##### d) Expected leftover at q = 6
-
-"
-
-# ╔═╡ d89982d5-64de-46e7-8847-79b78ad71d56
-leftover(ecotable_nvm, 6)
-
-# ╔═╡ 82d30f07-364d-4d6f-a7ff-81f3ef3e4790
-md"##### f) Smallest quantity q such that Pr[demand ≤ q] ≥ 90%
-
-"
-
-# ╔═╡ d76f07dc-1cb9-4d04-8fdf-e8be630de3e4
-quantile(ecotable_demand, 0.90)
-
-# ╔═╡ b1c38013-98b3-4edd-a87c-855ed4da4808
-md"##### d) Expected profit at q = 8
-
-"
-
-# ╔═╡ a6b96124-c8e1-40f3-8f23-add5b6187704
-profit(ecotable_nvm, 8)
-
-# ╔═╡ ecff0cfe-8ea2-4eb3-a064-106ae6f2bfa8
-md"### Pony Express" 
-
-# ╔═╡ fea33a55-38b8-44d7-b549-3174099c7b58
-md"First we define the demand:"
-
-# ╔═╡ 8aa6baf7-3128-47b8-8f45-35c6754ab29a
-xs = vec([5_000	10_000	15_000	20_000	25_000	30_000	35_000	40_000	45_000	50_000	55_000	60_000	65_000	70_000	75_000])
-
-# ╔═╡ 574c2a61-46fa-4f5c-8eac-7f08a507dc2a
-ps = vec([0.0181	0.0733	0.1467	0.1954	0.1954	0.1563	0.1042	0.0595	0.0298	0.0132	0.0053	0.0019	0.0006	0.0002	0.0001])
-
-# ╔═╡ a2daca19-41eb-4349-aa10-1a7518b0a0f9
-# The distribution is nonparametric
-elvis_demand = DiscreteNonParametric(xs,ps)
-
-# ╔═╡ 47237478-72ba-4650-bd96-f8de2b5baf3d
-# Define model
-elvis_nvm  = NVModel(cost = 6, price = 12, demand = elvis_demand, salvage = 2.5)
-
-# ╔═╡ 814cbf4c-5b21-4374-b484-1380a03e449c
-md"##### a) 
-
-
-"
-
-# ╔═╡ f1e2056f-f376-4bf3-9f54-19a10491200c
-cdf(elvis_demand, 30_000)
-
-# ╔═╡ 3de90f41-a309-4e70-b48f-7f9bee92fb51
-md"##### b) 
-
-
-"
-
-# ╔═╡ 70463c90-3e9c-4b27-842f-a1f4e42f3b28
-q_opt(elvis_nvm)
-
-# ╔═╡ 5d4e2337-309e-49ba-a970-19b512ae58e1
-md"##### c) 
-
-
-"
-
-# ╔═╡ 9f81c748-52ce-43c5-8b60-d4ed62e3b7c9
-quantile(elvis_demand, 0.9)
-
-# ╔═╡ 85621539-1a57-4626-adde-251074f16803
-md"##### d) 
-
-"
-
-# ╔═╡ 69a85cc2-db01-4574-af5d-62bc9f9fd6ae
-leftover(elvis_nvm, 50_000)
-
-# ╔═╡ 56d4dcc9-562f-4915-9a78-ea9a49ee8d09
-md"##### e) 
-
-"
-
-# ╔═╡ f1b912de-b66f-4684-a29d-5b3279fb4b50
-quantile(elvis_demand, 1.0) 
-
-# ╔═╡ 0a704099-7515-44fd-b329-34880166c4c3
-profit(elvis_nvm, 75_000) 
-
-# ╔═╡ 0a2b7ffa-54ab-4aec-bd00-c8c6068f294f
-md"The answer in the book appears to be confusing: IMHO lost sales = 0 if 75,000 wigs are ordered."
-
-# ╔═╡ 67ce094a-9cad-42f3-bd17-ac0ed3ecfc91
-md"""### Flextrola
-
-We just investigate part **(j)**: Variation with log normal demand
-"""
-
-# ╔═╡ b13b3d84-d43c-464f-ba1b-30e1fc7dc8fa
-# Parameter σ² of log normal distribution from mean= 1000 and standard deviation = 600
-σ² = log(1 + 600^2 / 1000^2)
-
-# ╔═╡ ecbcc004-012a-4ac3-99ba-cc6194e22700
-# Parameter μ of log normal distribution from mean = 1000 and standard deviation = 600
-μ = log(1000^2 / √(600^2 + 1000^2))
-
-# ╔═╡ be3145d3-1e72-4b27-818d-6d29b925edf1
-flextrola_demand = LogNormal(μ, √σ²)
-
-# ╔═╡ 27342a58-0bd2-43b4-9b44-3a04e9115086
-# Let us plot this as in the textbook
-begin
-using StatsPlots
-plot(xlims=(0, 2500), xlabel = "Demand", ylabel = "Probability")
-plot!(Normal(1000, 600), marker = :dot, label="Normal(Normal(1000, 600))")
-plot!(flextrola_demand, marker = :hex, label="LogNormal{Float64}(μ=6.86, σ=0.307)")
-end
-
-# ╔═╡ 0dedd60f-7a88-4570-bd74-080eb47b80db
-# Indeed, the parameters yield the desired mean
-mean(flextrola_demand)
-
-# ╔═╡ b5e7e67e-df34-498c-b97c-d34f6edde014
-# Indeed, the parameters yield the standard deviation
-std(flextrola_demand)
-
-# ╔═╡ 74ee066c-bc06-4a35-8945-148b3f546f91
-# Define the model
-flextrola_nvm = NVModel(cost = 72, price = 121, salvage = 50, demand=flextrola_demand)
-
-# ╔═╡ eb040544-c8b3-4156-a1fd-04fcc0a6d431
-solve(flextrola_nvm)
+# ╔═╡ 3f768a78-0051-407d-a6c7-d152ff5cd4c5
+c = 0.75; b = .5 - (2.75 - c)
+
+# ╔═╡ 76627c7b-5f47-4400-a1bc-2e52a2b81e21
+thesaurus_nvm = NVModel(cost = c, 
+						price = 2.75, 
+						# demand = Normal(180, 60),
+						demand = truncated(Normal(180, 60), 0, Inf),
+						backorder = b, 
+						salvage = c - c * 0.2 / 12
+)
+
+# ╔═╡ d2efbe91-dbbf-4f15-9762-57baf3e877e6
+myp = (
+ (2.75 - c) * sales(thesaurus_nvm, q_opt(thesaurus_nvm))
+- c * 0.2 / 12 * leftover(thesaurus_nvm, q_opt(thesaurus_nvm))
+- 0.05 * lost_sales(thesaurus_nvm, q_opt(thesaurus_nvm)) 
+)
+
+# ╔═╡ e23bd836-9c56-4707-bb41-de76692ae429
+(
+ (2.75 - c) * sales(thesaurus_nvm, q_opt(thesaurus_nvm))
+- c * 0.2 / 12 * leftover(thesaurus_nvm, q_opt(thesaurus_nvm))
+- b * lost_sales(thesaurus_nvm, q_opt(thesaurus_nvm)) 
+)
+
+# ╔═╡ 39015754-b1ea-4254-83df-bb35e79190ed
+- - (2.75 - c) * lost_sales(thesaurus_nvm, q_opt(thesaurus_nvm))
+
+# ╔═╡ 733107aa-d77f-44b5-b8bc-4a189d6bcf44
+(
+underage_cost(thesaurus_nvm) *  sales(thesaurus_nvm, q_opt(thesaurus_nvm))
+- overage_cost(thesaurus_nvm) *  leftover(thesaurus_nvm, q_opt(thesaurus_nvm))
++ profit_shift(thesaurus_nvm)
+)
+
+# ╔═╡ 4994c662-2f66-4fa4-8092-99e8c865b78e
+profit(thesaurus_nvm)
+
+# ╔═╡ ff314b51-2262-4fe1-acda-66f1b63ab896
+lost_sales(thesaurus_nvm, q_opt(thesaurus_nvm))
+
+# ╔═╡ 051e3f60-6a38-4a01-a5d1-8ebecc3cdcd9
+solve(thesaurus_nvm)
+
+# ╔═╡ eecb6474-3b3c-4862-9356-68dd26e6c075
+thesaurus_with_competition_nvm = NVModel(cost = 1.15, 
+										price = 2.75, 
+										demand = Normal(18, 6),
+										backorder = .5, 
+										salvage = 1.15 - 1.15 * 0.2 / 12
+)
+
+# ╔═╡ bd5d741f-4550-4883-9618-655ef4de6d15
+solve(thesaurus_with_competition_nvm)
 
 # ╔═╡ 8e239e87-682e-4244-8b2e-8c73c7a4737d
 md"""
 ## References
 - [NewsvendorModel.jl](https://github.com/frankhuettner/NewsvendorModel.jl)
-- Gerard Cachon, Christian Terwiesch, [Matching Supply with Demand: An Introduction to Operations Management. McGraw-Hill (2012)](http://cachon-terwiesch.net/3e/index.php), Chapters 12 and 13.
-- Gerard Cachon, Christian Terwiesch, Matching Supply with Demand: An Introduction to Operations Management. McGraw-Hill ([2018](https://www.mheducation.com/highered/product/)), Chapters 14 and 15.
+- Nahmias & Olson: Production and Operations Analysis, 7th edition
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -371,12 +171,14 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 NewsvendorModel = "63d3702b-073a-45e6-b43c-f47e8b08b809"
-StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
 Distributions = "~0.25.67"
 NewsvendorModel = "~0.2.2"
-StatsPlots = "~0.15.1"
+Plots = "~1.31.7"
+StatsBase = "~0.33.21"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -385,13 +187,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0"
 manifest_format = "2.0"
-project_hash = "e7aebd9def91f3c2b1f197f718d93ca3f2b9d7b3"
-
-[[deps.AbstractFFTs]]
-deps = ["ChainRulesCore", "LinearAlgebra"]
-git-tree-sha1 = "69f7020bd72f069c219b5e8c236c1fa90d2cb409"
-uuid = "621f4979-c628-5d54-868e-fcf4e3e8185c"
-version = "1.2.1"
+project_hash = "1d3ef0f0e1414c755aff8f9c2295439845c71906"
 
 [[deps.Adapt]]
 deps = ["LinearAlgebra"]
@@ -403,26 +199,8 @@ version = "3.4.0"
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
 version = "1.1.1"
 
-[[deps.Arpack]]
-deps = ["Arpack_jll", "Libdl", "LinearAlgebra", "Logging"]
-git-tree-sha1 = "91ca22c4b8437da89b030f08d71db55a379ce958"
-uuid = "7d9fca2a-8960-54d3-9f78-7d1dccf2cb97"
-version = "0.5.3"
-
-[[deps.Arpack_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "OpenBLAS_jll", "Pkg"]
-git-tree-sha1 = "5ba6c757e8feccf03a1554dfaf3e26b3cfc7fd5e"
-uuid = "68821587-b530-5797-8361-c406ea357684"
-version = "3.5.1+1"
-
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
-
-[[deps.AxisAlgorithms]]
-deps = ["LinearAlgebra", "Random", "SparseArrays", "WoodburyMatrices"]
-git-tree-sha1 = "66771c8d21c8ff5e3a93379480a2307ac36863f7"
-uuid = "13072b0f-2c55-5437-9ae7-d433b7a33950"
-version = "1.0.1"
 
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
@@ -456,12 +234,6 @@ deps = ["ChainRulesCore", "LinearAlgebra", "Test"]
 git-tree-sha1 = "38f7a08f19d8810338d4f5085211c7dfa5d5bdd8"
 uuid = "9e997f8a-9a97-42d5-a9f1-ce6bfc15e2c0"
 version = "0.1.4"
-
-[[deps.Clustering]]
-deps = ["Distances", "LinearAlgebra", "NearestNeighbors", "Printf", "SparseArrays", "Statistics", "StatsBase"]
-git-tree-sha1 = "75479b7df4167267d75294d14b58244695beb2ac"
-uuid = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
-version = "0.14.2"
 
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
@@ -525,12 +297,6 @@ git-tree-sha1 = "bfc1187b79289637fa0ef6d4436ebdfe6905cbd6"
 uuid = "e2d170a0-9d28-54be-80f0-106bbe20a464"
 version = "1.0.0"
 
-[[deps.DataValues]]
-deps = ["DataValueInterfaces", "Dates"]
-git-tree-sha1 = "d88a19299eba280a6d062e135a43f00323ae70bf"
-uuid = "e7dc6d0d-1eca-5fa6-8ad6-5aecde8b7ea5"
-version = "0.4.13"
-
 [[deps.Dates]]
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
@@ -544,16 +310,6 @@ deps = ["InverseFunctions", "Test"]
 git-tree-sha1 = "80c3e8639e3353e5d2912fb3a1916b8455e2494b"
 uuid = "b429d917-457f-4dbc-8f4c-0cc954292b1d"
 version = "0.4.0"
-
-[[deps.Distances]]
-deps = ["LinearAlgebra", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "3258d0659f812acde79e8a74b11f17ac06d0ca04"
-uuid = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
-version = "0.10.7"
-
-[[deps.Distributed]]
-deps = ["Random", "Serialization", "Sockets"]
-uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[deps.Distributions]]
 deps = ["ChainRulesCore", "DensityInterface", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SparseArrays", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "Test"]
@@ -606,18 +362,6 @@ deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers",
 git-tree-sha1 = "ccd479984c7838684b3ac204b716c89955c76623"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
 version = "4.4.2+0"
-
-[[deps.FFTW]]
-deps = ["AbstractFFTs", "FFTW_jll", "LinearAlgebra", "MKL_jll", "Preferences", "Reexport"]
-git-tree-sha1 = "90630efff0894f8142308e334473eba54c433549"
-uuid = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
-version = "1.5.0"
-
-[[deps.FFTW_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "c6033cc3892d0ef5bb9cd29b7f2f0331ea5184ea"
-uuid = "f5851436-0d7a-5f13-b9de-f02708fd171a"
-version = "3.3.10+0"
 
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
@@ -734,21 +478,9 @@ git-tree-sha1 = "f550e6e32074c939295eb5ea6de31849ac2c9625"
 uuid = "83e8ac13-25f8-5344-8a64-a9f2b223428f"
 version = "0.5.1"
 
-[[deps.IntelOpenMP_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "d979e54b71da82f3a65b62553da4fc3d18c9004c"
-uuid = "1d5cc7b8-4909-519e-a0f8-d0f5ad9712d0"
-version = "2018.0.3+2"
-
 [[deps.InteractiveUtils]]
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
-
-[[deps.Interpolations]]
-deps = ["Adapt", "AxisAlgorithms", "ChainRulesCore", "LinearAlgebra", "OffsetArrays", "Random", "Ratios", "Requires", "SharedArrays", "SparseArrays", "StaticArrays", "WoodburyMatrices"]
-git-tree-sha1 = "64f138f9453a018c8f3562e7bae54edc059af249"
-uuid = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
-version = "0.14.4"
 
 [[deps.InverseFunctions]]
 deps = ["Test"]
@@ -789,12 +521,6 @@ git-tree-sha1 = "b53380851c6e6664204efb2e62cd24fa5c47e4ba"
 uuid = "aacddb02-875f-59d6-b918-886e6ef4fbf8"
 version = "2.1.2+0"
 
-[[deps.KernelDensity]]
-deps = ["Distributions", "DocStringExtensions", "FFTW", "Interpolations", "StatsBase"]
-git-tree-sha1 = "9816b296736292a80b9a3200eb7fbb57aaa3917a"
-uuid = "5ab0869b-81aa-558d-bb23-cbf5423bbe9b"
-version = "0.6.5"
-
 [[deps.LAME_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "f6250b16881adf048549549fba48b1161acdac8c"
@@ -823,10 +549,6 @@ deps = ["Formatting", "InteractiveUtils", "LaTeXStrings", "MacroTools", "Markdow
 git-tree-sha1 = "1a43be956d433b5d0321197150c2f94e16c0aaa0"
 uuid = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
 version = "0.15.16"
-
-[[deps.LazyArtifacts]]
-deps = ["Artifacts", "Pkg"]
-uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -917,12 +639,6 @@ git-tree-sha1 = "5d4d2d9904227b8bd66386c1138cf4d5ffa826bf"
 uuid = "e6f89c97-d47a-5376-807f-9c37f3926c36"
 version = "0.4.9"
 
-[[deps.MKL_jll]]
-deps = ["Artifacts", "IntelOpenMP_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "Pkg"]
-git-tree-sha1 = "e595b205efd49508358f7dc670a940c790204629"
-uuid = "856f044c-d86e-5d09-b602-aeab76dc8ba7"
-version = "2022.0.0+0"
-
 [[deps.MacroTools]]
 deps = ["Markdown", "Random"]
 git-tree-sha1 = "3d3e902b31198a27340d0bf00d6ac452866021cf"
@@ -962,23 +678,11 @@ uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
 version = "2022.2.1"
 
-[[deps.MultivariateStats]]
-deps = ["Arpack", "LinearAlgebra", "SparseArrays", "Statistics", "StatsAPI", "StatsBase"]
-git-tree-sha1 = "7008a3412d823e29d370ddc77411d593bd8a3d03"
-uuid = "6f286f6a-111f-5878-ab1e-185364afe411"
-version = "0.9.1"
-
 [[deps.NaNMath]]
 deps = ["OpenLibm_jll"]
 git-tree-sha1 = "a7c3d1da1189a1c2fe843a3bfa04d18d20eb3211"
 uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
 version = "1.0.1"
-
-[[deps.NearestNeighbors]]
-deps = ["Distances", "StaticArrays"]
-git-tree-sha1 = "0e353ed734b1747fc20cd4cba0edd9ac027eff6a"
-uuid = "b8a86587-4115-5ab1-83bc-aa920d37bbce"
-version = "0.4.11"
 
 [[deps.NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
@@ -989,17 +693,6 @@ deps = ["Distributions", "Printf", "QuadGK"]
 git-tree-sha1 = "73aafd452d06c8be9cb5d279714b6f2f5871e6c8"
 uuid = "63d3702b-073a-45e6-b43c-f47e8b08b809"
 version = "0.2.2"
-
-[[deps.Observables]]
-git-tree-sha1 = "dfd8d34871bc3ad08cd16026c1828e271d554db9"
-uuid = "510215fc-4207-5dde-b226-833fc4488ee2"
-version = "0.5.1"
-
-[[deps.OffsetArrays]]
-deps = ["Adapt"]
-git-tree-sha1 = "1ea784113a6aa054c5ebd95945fa5e52c2f378e7"
-uuid = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
-version = "1.12.7"
 
 [[deps.Ogg_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1117,12 +810,6 @@ uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 deps = ["SHA", "Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
-[[deps.Ratios]]
-deps = ["Requires"]
-git-tree-sha1 = "dc84268fe0e3335a62e315a3a7cf2afa7178a734"
-uuid = "c84ed2f1-dad5-54f0-aa8e-dbefe2724439"
-version = "0.4.3"
-
 [[deps.RecipesBase]]
 git-tree-sha1 = "6bf3f380ff52ce0832ddd3a2a7b9538ed1bcca7d"
 uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
@@ -1173,18 +860,8 @@ git-tree-sha1 = "f94f779c94e58bf9ea243e77a37e16d9de9126bd"
 uuid = "6c6a2e73-6563-6170-7368-637461726353"
 version = "1.1.1"
 
-[[deps.SentinelArrays]]
-deps = ["Dates", "Random"]
-git-tree-sha1 = "db8481cf5d6278a121184809e9eb1628943c7704"
-uuid = "91c51154-3ec4-41a3-a24f-3f23e20d615c"
-version = "1.3.13"
-
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
-
-[[deps.SharedArrays]]
-deps = ["Distributed", "Mmap", "Random", "Serialization"]
-uuid = "1a1011a3-84de-559e-8e89-a11a2f7dc383"
 
 [[deps.Showoff]]
 deps = ["Dates", "Grisu"]
@@ -1233,9 +910,9 @@ uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[deps.StatsAPI]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "8d7530a38dbd2c397be7ddd01a424e4f411dcc41"
+git-tree-sha1 = "f9af7f195fb13589dd2e2d57fdb401717d2eb1f6"
 uuid = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
-version = "1.2.2"
+version = "1.5.0"
 
 [[deps.StatsBase]]
 deps = ["DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
@@ -1248,12 +925,6 @@ deps = ["ChainRulesCore", "HypergeometricFunctions", "InverseFunctions", "Irrati
 git-tree-sha1 = "5783b877201a82fc0014cbf381e7e6eb130473a4"
 uuid = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 version = "1.0.1"
-
-[[deps.StatsPlots]]
-deps = ["AbstractFFTs", "Clustering", "DataStructures", "DataValues", "Distributions", "Interpolations", "KernelDensity", "LinearAlgebra", "MultivariateStats", "Observables", "Plots", "RecipesBase", "RecipesPipeline", "Reexport", "StatsBase", "TableOperations", "Tables", "Widgets"]
-git-tree-sha1 = "2b35ba790f1f823872dcf378a6d3c3b520092eac"
-uuid = "f3b207a7-027a-5e70-b257-86293d7955fd"
-version = "0.15.1"
 
 [[deps.StructArrays]]
 deps = ["Adapt", "DataAPI", "StaticArraysCore", "Tables"]
@@ -1269,12 +940,6 @@ uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 version = "1.0.0"
-
-[[deps.TableOperations]]
-deps = ["SentinelArrays", "Tables", "Test"]
-git-tree-sha1 = "e383c87cf2a1dc41fa30c093b2a19877c83e1bc1"
-uuid = "ab02a1b2-a7df-11e8-156e-fb1833f50b87"
-version = "1.2.0"
 
 [[deps.TableTraits]]
 deps = ["IteratorInterfaceExtensions"]
@@ -1343,18 +1008,6 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "4528479aa01ee1b3b4cd0e6faef0e04cf16466da"
 uuid = "2381bf8a-dfd0-557d-9999-79630e7b1b91"
 version = "1.25.0+0"
-
-[[deps.Widgets]]
-deps = ["Colors", "Dates", "Observables", "OrderedCollections"]
-git-tree-sha1 = "fcdae142c1cfc7d89de2d11e08721d0f2f86c98a"
-uuid = "cc8bc4a8-27d6-5769-a93b-9d913e69aa62"
-version = "0.6.6"
-
-[[deps.WoodburyMatrices]]
-deps = ["LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "de67fa59e33ad156a590055375a30b23c40299d3"
-uuid = "efce3f68-66dc-5838-9240-27a6d6f5f9b6"
-version = "0.5.5"
 
 [[deps.XML2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libiconv_jll", "Pkg", "Zlib_jll"]
@@ -1570,85 +1223,37 @@ version = "1.4.1+0"
 """
 
 # ╔═╡ Cell order:
-# ╟─1e8dae5b-fa24-46d0-b591-4c6a719e0a6c
-# ╟─e48eb4c3-a372-4335-8d04-05f76ccc06a7
-# ╟─65eb4c20-8998-11ec-3abf-bb0dda80c6a9
 # ╠═29d61cca-ad0f-4753-8789-f9da6e557b87
+# ╟─65eb4c20-8998-11ec-3abf-bb0dda80c6a9
+# ╟─d1735113-39fa-45f7-b5a4-1925d9985e3d
+# ╠═d8d53f72-c901-45ff-99d8-9c0190460442
+# ╠═b8f5f21e-edfa-46b4-b574-4723c03db163
+# ╠═6fda8ecb-2b3a-4b89-9bc1-b6aad4efcb1f
+# ╟─bfbbc931-b36c-4e46-8375-03de53d51cfd
+# ╟─994805b2-c68b-4800-b3ea-def39ec6cd87
+# ╠═1b7eb3b0-0ac9-4bef-9cf9-fc1da1072150
+# ╟─44352ed2-e3c2-4ab1-a39e-c695242b5a12
 # ╠═11be7ca9-d279-4ff5-8b4d-4d1a5e144e43
 # ╠═fa3ce275-8a61-4204-af49-01ea8592b288
 # ╟─e20d3e01-39c4-46f2-8d8a-414bfd3048eb
+# ╠═cce4b651-c1ae-470a-a5b2-3c9e62d0bb4d
+# ╠═8a2b3ea9-b376-4d47-9d74-802106db2b98
+# ╠═72406e40-a328-4936-91e9-b9ae4c354165
 # ╠═af1c94ce-4900-4e4d-93b0-096917fd288d
 # ╟─198bb582-9f88-48a7-85ea-d71559f0a34b
 # ╠═60509577-f814-4770-ab01-41083bac00a5
-# ╟─84376bac-546a-4e44-bb97-7ecde967994b
-# ╠═ddb6f2c1-ca7a-4eb7-9f91-10323f21de44
-# ╟─a372b600-4940-47da-861d-a903cdb77f8a
-# ╠═44114735-088e-4223-b92a-b60da42f3fdc
-# ╟─e1cd3166-7163-454a-8a6d-9fb8f6eabcb3
-# ╠═251daa01-9129-485c-8fd4-d660c5ebff6d
-# ╟─981e3a79-a219-4870-9eae-2a01acd3e459
-# ╠═958d0d9a-81d9-40a7-a009-0ffbaeb26a0d
 # ╟─74e1fa73-67f4-473b-84a9-facd895aa666
-# ╠═390a2fdd-0910-4941-ac1f-11bb3174c564
-# ╠═1cc679f3-f753-487a-8cda-3e8369c5ffe1
-# ╟─98557010-627f-4de7-be6a-be583b48a121
-# ╠═db9a34bb-f82c-4360-8931-350b62de9816
-# ╟─cffc5227-1acd-4f58-9c9d-5527c2755632
-# ╠═b59d4b3d-b8f8-440c-9640-9f0a78e8a6a9
-# ╟─9a4131d2-0fb7-49b1-9fd6-f5b5f1cff5c5
-# ╠═a0ba77aa-d973-4f29-80da-c94f8cb177fb
-# ╟─47ff9c6d-d508-457c-af75-2b9914d5ed53
-# ╠═ca0d15f8-0c0f-446e-9ebc-0d8b04a2e37e
-# ╟─8701aae7-c40b-4ef6-b347-2938d11c6ec8
-# ╠═33a8fdc2-3221-4540-b49c-d51c4fbd7ba0
-# ╟─ed7e61da-5905-40f0-8d57-0721093eef77
-# ╠═672bcd43-e09b-4215-bf40-101a7e1ae0ce
-# ╟─d792260e-41bc-4b77-8444-5ddb4f536376
-# ╠═36b39a81-a876-4a0e-9dd9-5224436e2ef1
-# ╟─3daa3e0e-4aae-4b07-8ee8-e0fbef9abde2
-# ╠═d64bf64a-92a7-4747-8099-d525308cb99d
-# ╠═7127b4d0-87f5-42d7-a08c-0623bda740ae
-# ╟─8f7e2e1a-ac27-4a6f-9dda-e4364d1a69db
-# ╠═330bfc55-5197-4adb-a898-5adab6af407d
-# ╟─242c68ee-7147-4912-9652-960a459aca7e
-# ╠═5c05eb75-3e1f-4ef2-93d5-9d1a91286fea
-# ╟─820727f5-21b3-4c4b-a632-822f4c41f69c
-# ╠═cc2cfbf4-5e75-4de8-85dc-7cf24353164b
-# ╟─2914e282-8b19-4274-ba28-ae79ac03edb2
-# ╠═b9873a29-a100-43d5-b40e-783b33f69613
-# ╟─f07108dd-7555-409a-85ca-5f7742a4a8dc
-# ╠═d89982d5-64de-46e7-8847-79b78ad71d56
-# ╟─82d30f07-364d-4d6f-a7ff-81f3ef3e4790
-# ╠═d76f07dc-1cb9-4d04-8fdf-e8be630de3e4
-# ╟─b1c38013-98b3-4edd-a87c-855ed4da4808
-# ╠═a6b96124-c8e1-40f3-8f23-add5b6187704
-# ╟─ecff0cfe-8ea2-4eb3-a064-106ae6f2bfa8
-# ╟─fea33a55-38b8-44d7-b549-3174099c7b58
-# ╠═8aa6baf7-3128-47b8-8f45-35c6754ab29a
-# ╠═574c2a61-46fa-4f5c-8eac-7f08a507dc2a
-# ╠═a2daca19-41eb-4349-aa10-1a7518b0a0f9
-# ╠═47237478-72ba-4650-bd96-f8de2b5baf3d
-# ╟─814cbf4c-5b21-4374-b484-1380a03e449c
-# ╠═f1e2056f-f376-4bf3-9f54-19a10491200c
-# ╟─3de90f41-a309-4e70-b48f-7f9bee92fb51
-# ╠═70463c90-3e9c-4b27-842f-a1f4e42f3b28
-# ╟─5d4e2337-309e-49ba-a970-19b512ae58e1
-# ╠═9f81c748-52ce-43c5-8b60-d4ed62e3b7c9
-# ╟─85621539-1a57-4626-adde-251074f16803
-# ╠═69a85cc2-db01-4574-af5d-62bc9f9fd6ae
-# ╟─56d4dcc9-562f-4915-9a78-ea9a49ee8d09
-# ╠═f1b912de-b66f-4684-a29d-5b3279fb4b50
-# ╠═0a704099-7515-44fd-b329-34880166c4c3
-# ╟─0a2b7ffa-54ab-4aec-bd00-c8c6068f294f
-# ╟─67ce094a-9cad-42f3-bd17-ac0ed3ecfc91
-# ╠═b13b3d84-d43c-464f-ba1b-30e1fc7dc8fa
-# ╠═ecbcc004-012a-4ac3-99ba-cc6194e22700
-# ╠═be3145d3-1e72-4b27-818d-6d29b925edf1
-# ╠═0dedd60f-7a88-4570-bd74-080eb47b80db
-# ╠═b5e7e67e-df34-498c-b97c-d34f6edde014
-# ╠═27342a58-0bd2-43b4-9b44-3a04e9115086
-# ╠═74ee066c-bc06-4a35-8945-148b3f546f91
-# ╠═eb040544-c8b3-4156-a1fd-04fcc0a6d431
+# ╠═3f768a78-0051-407d-a6c7-d152ff5cd4c5
+# ╠═76627c7b-5f47-4400-a1bc-2e52a2b81e21
+# ╠═d2efbe91-dbbf-4f15-9762-57baf3e877e6
+# ╠═e23bd836-9c56-4707-bb41-de76692ae429
+# ╠═39015754-b1ea-4254-83df-bb35e79190ed
+# ╠═733107aa-d77f-44b5-b8bc-4a189d6bcf44
+# ╠═4994c662-2f66-4fa4-8092-99e8c865b78e
+# ╠═ff314b51-2262-4fe1-acda-66f1b63ab896
+# ╠═051e3f60-6a38-4a01-a5d1-8ebecc3cdcd9
+# ╠═eecb6474-3b3c-4862-9356-68dd26e6c075
+# ╠═bd5d741f-4550-4883-9618-655ef4de6d15
 # ╟─8e239e87-682e-4244-8b2e-8c73c7a4737d
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
