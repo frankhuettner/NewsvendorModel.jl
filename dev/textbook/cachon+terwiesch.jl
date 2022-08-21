@@ -4,15 +4,12 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ a12a8adb-f80c-4adb-8078-256da423e0eb
-using PlutoUI
-
 # ╔═╡ 29d61cca-ad0f-4753-8789-f9da6e557b87
 # Load the packages needed
 using NewsvendorModel, Distributions
 
-# ╔═╡ 11b91069-9b05-4eb3-ad4c-5fc64a95eced
-TableOfContents(aside=false)
+# ╔═╡ a12a8adb-f80c-4adb-8078-256da423e0eb
+# using PlutoUI; TableOfContents(aside=false)
 
 # ╔═╡ 1e8dae5b-fa24-46d0-b591-4c6a719e0a6c
 md"""
@@ -374,13 +371,11 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 NewsvendorModel = "63d3702b-073a-45e6-b43c-f47e8b08b809"
-PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 
 [compat]
 Distributions = "~0.25.67"
 NewsvendorModel = "~0.2.1"
-PlutoUI = "~0.7.39"
 StatsPlots = "~0.15.1"
 """
 
@@ -390,19 +385,13 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0"
 manifest_format = "2.0"
-project_hash = "818a29b9e3cc416c56564b225a0ad31878de0198"
+project_hash = "777d8c041c7f5239640c222aed2b21179e4f9ca7"
 
 [[deps.AbstractFFTs]]
 deps = ["ChainRulesCore", "LinearAlgebra"]
 git-tree-sha1 = "69f7020bd72f069c219b5e8c236c1fa90d2cb409"
 uuid = "621f4979-c628-5d54-868e-fcf4e3e8185c"
 version = "1.2.1"
-
-[[deps.AbstractPlutoDingetjes]]
-deps = ["Pkg"]
-git-tree-sha1 = "8eaf9f1b4921132a4cff3f36a1d9ba923b14a481"
-uuid = "6e696c72-6542-2067-7265-42206c756150"
-version = "1.1.4"
 
 [[deps.Adapt]]
 deps = ["LinearAlgebra"]
@@ -739,24 +728,6 @@ deps = ["DualNumbers", "LinearAlgebra", "OpenLibm_jll", "SpecialFunctions", "Tes
 git-tree-sha1 = "709d864e3ed6e3545230601f94e11ebc65994641"
 uuid = "34004b35-14d8-5ef3-9330-4cdb6864b03a"
 version = "0.3.11"
-
-[[deps.Hyperscript]]
-deps = ["Test"]
-git-tree-sha1 = "8d511d5b81240fc8e6802386302675bdf47737b9"
-uuid = "47d2ed2b-36de-50cf-bf87-49c2cf4b8b91"
-version = "0.0.4"
-
-[[deps.HypertextLiteral]]
-deps = ["Tricks"]
-git-tree-sha1 = "c47c5fa4c5308f27ccaac35504858d8914e102f9"
-uuid = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
-version = "0.9.4"
-
-[[deps.IOCapture]]
-deps = ["Logging", "Random"]
-git-tree-sha1 = "f7be53659ab06ddc986428d3a9dcc95f6fa6705a"
-uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
-version = "0.2.2"
 
 [[deps.IniFile]]
 git-tree-sha1 = "f550e6e32074c939295eb5ea6de31849ac2c9625"
@@ -1116,12 +1087,6 @@ git-tree-sha1 = "a19652399f43938413340b2068e11e55caa46b65"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 version = "1.31.7"
 
-[[deps.PlutoUI]]
-deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "Markdown", "Random", "Reexport", "UUIDs"]
-git-tree-sha1 = "8d1f54886b9037091edf146b517989fc4a09efec"
-uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.39"
-
 [[deps.Preferences]]
 deps = ["TOML"]
 git-tree-sha1 = "47e5f437cc0e7ef2ce8406ce1e7e24d44915f88d"
@@ -1343,11 +1308,6 @@ deps = ["Random", "Test"]
 git-tree-sha1 = "4ad90ab2bbfdddcae329cba59dab4a8cdfac3832"
 uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
 version = "0.9.7"
-
-[[deps.Tricks]]
-git-tree-sha1 = "6bac775f2d42a611cdfcd1fb217ee719630c4175"
-uuid = "410a4b4d-49e4-4fbc-ab6d-cb71b17b3775"
-version = "0.1.6"
 
 [[deps.URIs]]
 git-tree-sha1 = "e59ecc5a41b000fa94423a578d29290c7266fc10"
@@ -1611,7 +1571,6 @@ version = "1.4.1+0"
 
 # ╔═╡ Cell order:
 # ╟─a12a8adb-f80c-4adb-8078-256da423e0eb
-# ╟─11b91069-9b05-4eb3-ad4c-5fc64a95eced
 # ╟─1e8dae5b-fa24-46d0-b591-4c6a719e0a6c
 # ╟─65eb4c20-8998-11ec-3abf-bb0dda80c6a9
 # ╠═29d61cca-ad0f-4753-8789-f9da6e557b87
