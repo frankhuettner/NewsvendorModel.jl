@@ -40,7 +40,7 @@ md" ### Demand and distribution fitting"
 
 # ╔═╡ d8d53f72-c901-45ff-99d8-9c0190460442
 # store the given data in the variable `observed_demand`
-observed_demand = vec([15 19 9 12 9 22 4 7 8 11 14 11 6 11 9 18 10 0 14 12 8 9 5 4 4 17 18 14 15 8 6 7 12 15 15 19 9 10 9 16 8 11 11 18 15 17 19 14 14 17 13 12])
+observed_demand = vec([15 19 9 12 9 22 4 7 8 11 14 11 6 11 9 18 10 0 14 12 8 9 5 4 4 17 18 14 15 8 6 7 12 15 15 19 9 10 9 16 8 11 11 18 15 17 19 14 14 17 13 12]);
 
 # ╔═╡ b8f5f21e-edfa-46b4-b574-4723c03db163
 D̄ = mean(observed_demand)
@@ -111,57 +111,33 @@ The book offers exercises with solutions. Here is a small selection that illustr
 """
 
 # ╔═╡ 3f768a78-0051-407d-a6c7-d152ff5cd4c5
-c = 0.75; b = .5 - (2.75 - c)
+c = 1.15
+
+# ╔═╡ b44f2c1e-f62d-4711-85b4-ef88f1595d4b
+p = 2.75
 
 # ╔═╡ 76627c7b-5f47-4400-a1bc-2e52a2b81e21
 thesaurus_nvm = NVModel(cost = c, 
-						price = 2.75, 
-						# demand = Normal(180, 60),
-						demand = truncated(Normal(180, 60), 0, Inf),
-						backorder = b, 
-						salvage = c - c * 0.2 / 12
+						price = p, 
+						demand = truncated(Normal(18, 6), 0, Inf),
+						backorder = 0.5,
+						substitute = p - c,
+						salvage = c,
+						holding = c * 0.2 / 12,
 )
-
-# ╔═╡ d2efbe91-dbbf-4f15-9762-57baf3e877e6
-myp = (
- (2.75 - c) * sales(thesaurus_nvm, q_opt(thesaurus_nvm))
-- c * 0.2 / 12 * leftover(thesaurus_nvm, q_opt(thesaurus_nvm))
-- 0.05 * lost_sales(thesaurus_nvm, q_opt(thesaurus_nvm)) 
-)
-
-# ╔═╡ e23bd836-9c56-4707-bb41-de76692ae429
-(
- (2.75 - c) * sales(thesaurus_nvm, q_opt(thesaurus_nvm))
-- c * 0.2 / 12 * leftover(thesaurus_nvm, q_opt(thesaurus_nvm))
-- b * lost_sales(thesaurus_nvm, q_opt(thesaurus_nvm)) 
-)
-
-# ╔═╡ 39015754-b1ea-4254-83df-bb35e79190ed
-- - (2.75 - c) * lost_sales(thesaurus_nvm, q_opt(thesaurus_nvm))
-
-# ╔═╡ 733107aa-d77f-44b5-b8bc-4a189d6bcf44
-(
-underage_cost(thesaurus_nvm) *  sales(thesaurus_nvm, q_opt(thesaurus_nvm))
-- overage_cost(thesaurus_nvm) *  leftover(thesaurus_nvm, q_opt(thesaurus_nvm))
-+ profit_shift(thesaurus_nvm)
-)
-
-# ╔═╡ 4994c662-2f66-4fa4-8092-99e8c865b78e
-profit(thesaurus_nvm)
-
-# ╔═╡ ff314b51-2262-4fe1-acda-66f1b63ab896
-lost_sales(thesaurus_nvm, q_opt(thesaurus_nvm))
 
 # ╔═╡ 051e3f60-6a38-4a01-a5d1-8ebecc3cdcd9
 solve(thesaurus_nvm)
 
 # ╔═╡ eecb6474-3b3c-4862-9356-68dd26e6c075
-thesaurus_with_competition_nvm = NVModel(cost = 1.15, 
-										price = 2.75, 
-										demand = Normal(18, 6),
-										backorder = .5, 
-										salvage = 1.15 - 1.15 * 0.2 / 12
-)
+thesaurus_with_competition_nvm = NVModel(cost = c, 
+											price = p, 
+											demand = truncated(Normal(18, 6), 0, Inf),
+											backorder = 0.5,
+											# substitute = p - c,
+											salvage = c,
+											holding = c * 0.2 / 12,
+								)
 
 # ╔═╡ bd5d741f-4550-4883-9618-655ef4de6d15
 solve(thesaurus_with_competition_nvm)
@@ -1252,13 +1228,8 @@ version = "1.4.1+0"
 # ╠═60509577-f814-4770-ab01-41083bac00a5
 # ╟─74e1fa73-67f4-473b-84a9-facd895aa666
 # ╠═3f768a78-0051-407d-a6c7-d152ff5cd4c5
+# ╠═b44f2c1e-f62d-4711-85b4-ef88f1595d4b
 # ╠═76627c7b-5f47-4400-a1bc-2e52a2b81e21
-# ╠═d2efbe91-dbbf-4f15-9762-57baf3e877e6
-# ╠═e23bd836-9c56-4707-bb41-de76692ae429
-# ╠═39015754-b1ea-4254-83df-bb35e79190ed
-# ╠═733107aa-d77f-44b5-b8bc-4a189d6bcf44
-# ╠═4994c662-2f66-4fa4-8092-99e8c865b78e
-# ╠═ff314b51-2262-4fe1-acda-66f1b63ab896
 # ╠═051e3f60-6a38-4a01-a5d1-8ebecc3cdcd9
 # ╠═eecb6474-3b3c-4862-9356-68dd26e6c075
 # ╠═bd5d741f-4550-4883-9618-655ef4de6d15
