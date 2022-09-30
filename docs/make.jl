@@ -42,7 +42,7 @@ makedocs(
             "Rounded Output" => "x21_optimize_options.md",
             "Demand Distribution" => "x30_distributions.md",
             "Textbook Examples" => ["Cachon and Terwiesch" => "textbook/cachon+terwiesch.md",
-                                    "Nahmias and Olson" => "textbook/nahmias+olson.md",
+                                    "Nahmias and Olsen" => "textbook/nahmias+olsen.md",
             ],
             "Library" => "x50_library.md",
     ]

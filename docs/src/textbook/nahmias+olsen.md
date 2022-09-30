@@ -29,9 +29,9 @@
     julia_version = "1.7.1"
 -->
 
-<div class="markdown"><p>This notebook illustrates the usage of <a href="https://github.com/frankhuettner/NewsvendorModel.jl">NewsvendorModel.jl</a> with examples from the <strong>excellent textbook by Nahmias &amp; Olson 7th</strong> or <a href="https://www.waveland.com/browse.php?t&#61;662">8th</a> edition.</p>
+<div class="markdown"><p>This notebook illustrates the usage of <a href="https://github.com/frankhuettner/NewsvendorModel.jl">NewsvendorModel.jl</a> with examples from the <strong>excellent textbook by Nahmias &amp; Olsen 7th</strong> or <a href="https://www.waveland.com/browse.php?t&#61;662">8th</a> edition.</p>
 <p>These notes are not self-contained but should be considered as a companion to the above text book.</p>
-<p>You can load this notebook in <a href="https://github.com/fonsp/Pluto.jl">Pluto</a> from here: <a href="https://github.com/frankhuettner/NewsvendorModel.jl/blob/main/docs/src/textbook/nahmias&#37;2Bolson.jl">https://github.com/frankhuettner/NewsvendorModel.jl/blob/main/docs/src/textbook/nahmias&#37;2Bolson.jl</a></p>
+<p>You can load this notebook in <a href="https://github.com/fonsp/Pluto.jl">Pluto</a> from here: <a href="https://github.com/frankhuettner/NewsvendorModel.jl/blob/main/docs/src/textbook/nahmias&#37;2Bolsen.jl">https://github.com/frankhuettner/NewsvendorModel.jl/blob/main/docs/src/textbook/nahmias&#37;2Bolsen.jl</a></p>
 </div>
 
 <pre class='language-julia'><code class='language-julia'># Load the needed packages
@@ -322,7 +322,7 @@ Ordering the optimal quantity yields
 <ul>
 <li><p><a href="https://github.com/frankhuettner/NewsvendorModel.jl">NewsvendorModel.jl</a></p>
 </li>
-<li><p>Nahmias &amp; Olson: Production and Operations Analysis, 7th edition</p>
+<li><p>Nahmias &amp; Olsen: Production and Operations Analysis, 7th edition</p>
 </li>
 </ul>
 </div>

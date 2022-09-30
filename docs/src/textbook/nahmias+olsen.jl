@@ -10,11 +10,11 @@ using NewsvendorModel, Distributions,  StatsBase, Plots
 
 # ╔═╡ 65eb4c20-8998-11ec-3abf-bb0dda80c6a9
 md"""
-This notebook illustrates the usage of [NewsvendorModel.jl](https://github.com/frankhuettner/NewsvendorModel.jl) with examples from the **excellent textbook by Nahmias & Olson 7th** or [8th](https://www.waveland.com/browse.php?t=662) edition.
+This notebook illustrates the usage of [NewsvendorModel.jl](https://github.com/frankhuettner/NewsvendorModel.jl) with examples from the **excellent textbook by Nahmias & Olsen 7th** or [8th](https://www.waveland.com/browse.php?t=662) edition.
 
 These notes are not self-contained but should be considered as a companion to the above text book.
 
-You can load this notebook in [Pluto](https://github.com/fonsp/Pluto.jl) from here: [https://github.com/frankhuettner/NewsvendorModel.jl/blob/main/docs/src/textbook/nahmias%2Bolson.jl](https://github.com/frankhuettner/NewsvendorModel.jl/blob/main/docs/src/textbook/nahmias%2Bolson.jl)
+You can load this notebook in [Pluto](https://github.com/fonsp/Pluto.jl) from here: [https://github.com/frankhuettner/NewsvendorModel.jl/blob/main/docs/src/textbook/nahmias%2Bolsen.jl](https://github.com/frankhuettner/NewsvendorModel.jl/blob/main/docs/src/textbook/nahmias%2Bolsen.jl)
 
 
 
@@ -146,7 +146,7 @@ solve(thesaurus_with_competition_nvm)
 md"""
 ## References
 - [NewsvendorModel.jl](https://github.com/frankhuettner/NewsvendorModel.jl)
-- Nahmias & Olson: Production and Operations Analysis, 7th edition
+- Nahmias & Olsen: Production and Operations Analysis, 7th edition
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
